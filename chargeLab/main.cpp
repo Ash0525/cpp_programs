@@ -26,7 +26,7 @@ int main() {
     // Particle 2
     Particle p2;
     p2.SetName("Proton 1");
-    p2.SetMass(1836.0);
+    p2.SetMass(1.0);
     p2.SetCharge(1.0);
     p2.SetRadius(5.0);
     p2.SetPosition(600.0, 350.0);
@@ -48,10 +48,17 @@ int main() {
     for (const auto& p : particles) {
         p.Print();
     }
+
+    // Start clock
+    sf::Clock clock;
     
     // Main loop
     while (window.isOpen()) {
+        double dt = clock.restart().asSeconds();
+
+        // Handle window events
         while (auto event = window.pollEvent()) {
+            // if the window is closing
             if (event->is<sf::Event::Closed>()) {
                 std::cout << "Closing window..." << std::endl;
                 window.close();
@@ -61,17 +68,26 @@ int main() {
         // Clear window
         window.clear(sf::Color::Black);
         
+        // Apply forces to the particles
+        for (auto& p : particles) {
+
+            p.ApplyForce(1000.0, 0.0, dt);
+            p.Move(dt);
+        }
+
         // Draw particles
         for (const auto& p : particles) {
+
+            // Get the circle radius
             sf::CircleShape circle(static_cast<float>(p.GetRadius()));
             circle.setOrigin({static_cast<float>(p.GetRadius()), static_cast<float>(p.GetRadius())});
             circle.setPosition({static_cast<float>(p.GetXPos()), static_cast<float>(p.GetYPos())});
             
             // Color based on charge
             if (p.GetCharge() < 0) {
-                circle.setFillColor(sf::Color::Cyan);  // Negative charge = blue
+                circle.setFillColor(sf::Color::Red);  // Negative charge = blue
             } else {
-                circle.setFillColor(sf::Color::Red);   // Positive charge = red
+                circle.setFillColor(sf::Color::Cyan);   // Positive charge = red
             }
             
             window.draw(circle);
