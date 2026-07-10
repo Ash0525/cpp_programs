@@ -8,6 +8,7 @@ class Simulation {
     public: 
         // Define constructor
         Simulation();
+        Simulation(double width, double height);
 
         // Add a particle to the vector particles
         void AddParticle(const Particle& newParticle);
@@ -15,7 +16,8 @@ class Simulation {
         void Update(double dt);
         void Draw(sf::RenderWindow& window) const;
         void PrintParticles() const;
-    
+        void HandleBoundaries(Particle& particle);
+        
     private:
         // private functions
         // Add the forces using sum of the forces

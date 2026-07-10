@@ -3,9 +3,19 @@
 #include "Particle.h"
 #include "Simulation.h"
 
+// Default simulation size
 Simulation::Simulation() {
-
+    width = 900.0;
+    height = 700.0;
 };
+
+// Custom size for simulation
+Simulation::Simulation(double width, double height) {
+
+    // update the width and height in private
+    this->width = width;
+    this->height = height;
+}
 
 void Simulation::AddParticle(const Particle& newParticle) {
     
@@ -16,8 +26,11 @@ void Simulation::AddParticle(const Particle& newParticle) {
 // Update function will update the physics of the simulation
 void Simulation::Update(double dt) {
     for (Particle& particle : particles) {
-        // For now, just move the particle based on velocity
+        // Move the particles
         particle.Move(dt);
+
+        // When the particles hit the wall, HandleBoundaries
+        HandleBoundaries(particle);
     }
 };
 
@@ -63,5 +76,42 @@ void Simulation::PrintParticles() const {
     for (const Particle& particle : particles) {
         particle.Print();
         std::cout << std::endl;
+    }
+}
+
+// Boundaries ensure that the particles do not move off the screen
+void Simulation::HandleBoundaries(Particle& particle) {
+    double x = particle.GetXPos();
+    double y = particle.GetYPos();
+
+    double vx = particle.GetVX();
+    double vy = particle.GetVY();
+
+    double r = particle.GetRadius();
+
+    // Left wall. If the x position of the particle minus radius is less than 0 (left limit of width)
+    if (x - r < 0.0) {
+        // reverse the direction of vx
+        particle.SetPosition(r, y);
+        particle.SetVelocity(-vx, vy);
+    }
+
+    // Right wall
+    if (x + r > width) {
+        particle.SetPosition(width - r, y);
+        particle.SetVelocity(-vx, vy);
+    }
+
+    // Top wall
+    if (y - r < 0.0) {
+        // reverse the direction of vx
+        particle.SetPosition(x, r);
+        particle.SetVelocity(vx, -vy);
+    }
+
+    // Right wall
+    if (y + r > height) {
+        particle.SetPosition(x, height - r);
+        particle.SetVelocity(-vx, -vy);
     }
 }

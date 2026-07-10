@@ -6,109 +6,56 @@
 
 int main() {
     std::cout << "ChargeLab Starting..." << std::endl;
-    
+    // Recreating main but with the Simulation instead of making individual particles
+
     // Create window
     sf::RenderWindow window(sf::VideoMode({900, 700}), "ChargeLab");
     window.setFramerateLimit(60);
-    
-    // Create particles
-    std::vector<Particle> particles;
-    
-    // Particle 1
-    Particle p1;
-    p1.SetName("Electron 1");
-    p1.SetMass(1.0);
-    p1.SetCharge(-1.0);
-    p1.SetRadius(8.0);
-    p1.SetPosition(300.0, 350.0);
-    p1.SetVelocity(0.0, 0.0);
-    particles.push_back(p1);
-    
-    // Particle 2
-    Particle p2;
-    p2.SetName("Proton 1");
-    p2.SetMass(1.0);
-    p2.SetCharge(1.0);
-    p2.SetRadius(5.0);
-    p2.SetPosition(600.0, 350.0);
-    p2.SetVelocity(0.0, 0.0);
-    particles.push_back(p2);
-    
-    // Particle 3
-    Particle p3;
-    p3.SetName("Electron 2");
-    p3.SetMass(1.0);
-    p3.SetCharge(-1.0);
-    p3.SetRadius(8.0);
-    p3.SetPosition(450.0, 200.0);
-    p3.SetVelocity(0.0, 0.0);
-    particles.push_back(p3);
-
-    Particle p4;
-    p4.SetName("Positive");
-    p4.SetCharge(-1.0);
-    p4.SetRadius(12.0);
-    p4.SetPosition(500.0, 300.0);
 
     // Make a simulation object
-    Simulation sim;
-
-    
-    // Show the stats of the particles that I initialized
-    std::cout << "Created " << particles.size() << " particles" << std::endl;
-    for (const auto& p : particles) {
-        p.Print();
-    }
+    Simulation simulation(900.0, 700.0);
 
     // Start clock
     sf::Clock clock;
+
+    // Declare particles
+    Particle p1;
+    p1.SetName("Positive");
+    p1.SetMass(10.0);
+    p1.SetCharge(1.0);
+    p1.SetRadius(20.0);
+    p1.SetPosition(250.0, 150.0);
+    p1.SetVelocity(150.0, 15.0);
+
+    Particle p2;
+    p2.SetName("Negative");
+    p2.SetMass(10.0);
+    p2.SetCharge(-1.0);
+    p2.SetRadius(20.0);
+    p2.SetPosition(350.0, 250.0);
+    p2.SetVelocity(100.0, 50.0);
+
+    // Add the particles to the simulation
+    simulation.AddParticle(p1);
+    simulation.AddParticle(p2);
+
+    // Print the particles that were made
+    simulation.PrintParticles();
     
     // Main loop
     while (window.isOpen()) {
         double dt = clock.restart().asSeconds();
 
-        // Handle window events
-        while (auto event = window.pollEvent()) {
-            // if the window is closing
+        while (const std::optional event = window.pollEvent()) {
             if (event->is<sf::Event::Closed>()) {
-                std::cout << "Closing window..." << std::endl;
                 window.close();
             }
         }
-        
-        // Clear window
+
+        simulation.Update(dt);
+
         window.clear(sf::Color::Black);
-        
-        sim.Update(dt);
-        // Add particle 4 to the simulation
-        sim.AddParticle(p4);
-        sim.Draw(window);
-
-        // Apply forces to the particles
-        for (auto& p : particles) {
-
-            p.ApplyForce(1000.0, 0.0, dt);
-            p.Move(dt);
-        }
-
-        // Draw particles
-        for (const auto& p : particles) {
-
-            // Get the circle radius
-            sf::CircleShape circle(static_cast<float>(p.GetRadius()));
-            circle.setOrigin({static_cast<float>(p.GetRadius()), static_cast<float>(p.GetRadius())});
-            circle.setPosition({static_cast<float>(p.GetXPos()), static_cast<float>(p.GetYPos())});
-            
-            // Color based on charge
-            if (p.GetCharge() < 0) {
-                circle.setFillColor(sf::Color::Red);  // Negative charge = blue
-            } else {
-                circle.setFillColor(sf::Color::Cyan);   // Positive charge = red
-            }
-            
-            window.draw(circle);
-        }
-        
+        simulation.Draw(window);
         window.display();
     }
     
