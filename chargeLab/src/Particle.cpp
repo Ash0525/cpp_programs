@@ -51,6 +51,9 @@ std::string Particle::GetName() const {
 
 // Setting the mass
 void Particle::SetMass(double newMass) {
+    if (newMass <= 0.0) {
+        throw std::invalid_argument("Particle mass can't be negative, bro");
+    }
     mass = newMass;
 }
 
@@ -69,6 +72,9 @@ double Particle::GetCharge() const {
 
 // Setting the radius.
 void Particle::SetRadius(double newRadius) {
+    if (newRadius < 0.0) {
+        throw std::invalid_argument("Particle cannot have a negative radius, my dude");
+    }
     radius = newRadius;
 }
 
@@ -116,6 +122,13 @@ double Particle::DistanceTo(const Particle& otherParticle) const {
 // Apply force
 void Particle::ApplyForce(double fx, double fy, double dt) {
 
+    if (mass <= 0.0) {
+        throw std::runtime_error("Why you dividing by zero???");
+    }
+
+    if (dt < 0.0) {
+        throw std::runtime_error("Are you going back in time?");
+    }
     // acceleration = force / mass
     double ax = fx / mass;
     double ay = fy / mass;
