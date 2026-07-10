@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include "src/Particle.h"
+#include "src/Simulation.h"
 #include <vector>
 
 int main() {
@@ -42,6 +43,16 @@ int main() {
     p3.SetPosition(450.0, 200.0);
     p3.SetVelocity(0.0, 0.0);
     particles.push_back(p3);
+
+    Particle p4;
+    p4.SetName("Positive");
+    p4.SetCharge(-1.0);
+    p4.SetRadius(12.0);
+    p4.SetPosition(500.0, 300.0);
+
+    // Make a simulation object
+    Simulation sim;
+
     
     // Show the stats of the particles that I initialized
     std::cout << "Created " << particles.size() << " particles" << std::endl;
@@ -68,6 +79,11 @@ int main() {
         // Clear window
         window.clear(sf::Color::Black);
         
+        sim.Update(dt);
+        // Add particle 4 to the simulation
+        sim.AddParticle(p4);
+        sim.Draw(window);
+
         // Apply forces to the particles
         for (auto& p : particles) {
 

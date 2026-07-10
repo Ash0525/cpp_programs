@@ -7,7 +7,7 @@
 // Defining the Constructor
 Particle::Particle() {
     name = "";
-    mass = 0.0;
+    mass = 1.0;
     charge = 0.0;
     radius = 0.0;
     xPos = 0.0;
