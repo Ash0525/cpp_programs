@@ -434,4 +434,20 @@ bool Simulation::SelectedParticleAt(double x, double y) {
             return true;
         }
     }
+
+    // return false if the user did not click within a particle
+    return false;
+}
+
+void Simulation::ClearSelectedParticle() {
+    selectedParticleIndex = -1;
+}
+
+bool Simulation::HasSelectedParticle() const {
+
+    return selectedParticleIndex != -1;
+}
+
+int Simulation::GetSelectedParticleIndex() const {
+    return selectedParticleIndex;
 }

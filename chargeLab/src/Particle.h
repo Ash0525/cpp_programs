@@ -66,8 +66,4 @@ class Particle {
 
         double xVelocity;
         double yVelocity;
-
-        // Selected particle index lets the program know if a particle was selected
-        int selectedParticleIndex;
-
 };
