@@ -11,9 +11,11 @@ class Simulation {
         Simulation();
         Simulation(double width, double height);
 
-        // Add a particle to the vector particles
-        void AddParticle(const Particle& newParticle);
+        // ADD PARTICLES
+        bool AddParticle(const Particle& newParticle);
         void ClearParticles();
+
+        // ESSENTIAL SIMULATION FUNCTIONS
         void Update(double dt);
         void Draw(sf::RenderWindow& window) const;
         void PrintParticles() const;
@@ -22,6 +24,15 @@ class Simulation {
         void TogglePaused();
         void SetPaused(bool newPaused);
         bool IsPaused() const;
+
+        // HANDLE PARTICLE COUNT
+        int GetParticleCount() const;
+        int GetMaxParticles() const;
+
+        void SetMaxParticles(int newMaxParticles);
+        void IncreaseMaxParticles(int amount);
+        void DecreaseMaxParticles(int amount);
+        bool IsFull() const;
         
         
     private:
@@ -56,4 +67,5 @@ class Simulation {
         double width;
         double height;
         bool paused;
+        int maxParticles;
 };

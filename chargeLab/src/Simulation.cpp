@@ -6,17 +6,22 @@
 #include "Vector2D.h"
 
 // Default simulation size
-Simulation::Simulation() {
+Simulation::Simulation()
+{
     width = 900.0;
     height = 700.0;
     minDistanceClamp = 20.0;
 
     // Add pause default
     paused = false;
+
+    // Max particles
+    maxParticles = 10;
 };
 
 // Custom size for simulation
-Simulation::Simulation(double width, double height) {
+Simulation::Simulation(double width, double height)
+{
 
     // update the width and height in private
     this->width = width;
@@ -25,38 +30,53 @@ Simulation::Simulation(double width, double height) {
 
     // Add puase defualt
     paused = false;
+
+    maxParticles = 10;
 }
 
-void Simulation::TogglePaused() {
+void Simulation::TogglePaused()
+{
     paused = !paused;
 }
 
-void Simulation::SetPaused(bool newPaused) {
+void Simulation::SetPaused(bool newPaused)
+{
     paused = newPaused;
 }
 
-bool Simulation::IsPaused() const {
+bool Simulation::IsPaused() const
+{
     return paused;
 }
 
-void Simulation::AddParticle(const Particle& newParticle) {
-    
-    // Push a new particle object into the vector list particles
+bool Simulation::AddParticle(const Particle &newParticle)
+{
+
+    // Check if particles is greater than max size
+    if (particles.size() >= maxParticles)
+    {
+        return false;
+    }
+
     particles.push_back(newParticle);
+    return true;
 };
 
 // Update function will update the physics of the simulation
-void Simulation::Update(double dt) {
+void Simulation::Update(double dt)
+{
 
     // If paused, then return
-    if (paused) {
+    if (paused)
+    {
         return;
     }
-    
+
     // Initialize the force
     ApplyCoulombForces(dt);
-    
-    for (Particle& particle : particles) {
+
+    for (Particle &particle : particles)
+    {
         // Move the particles
         particle.Move(dt);
 
@@ -68,35 +88,39 @@ void Simulation::Update(double dt) {
 };
 
 // Draw simulation particles
-void Simulation::Draw(sf::RenderWindow& window) const {
-    for (const Particle& particle : particles) {
+void Simulation::Draw(sf::RenderWindow &window) const
+{
+    for (const Particle &particle : particles)
+    {
         double radius = particle.GetRadius();
 
         // Declare circle object for every particle
         sf::CircleShape circle(static_cast<float>(radius));
-        circle.setOrigin({
-            static_cast<float>(radius),
-            static_cast<float>(radius)
-        });
+        circle.setOrigin({static_cast<float>(radius),
+                          static_cast<float>(radius)});
 
         // Set the position of the each particle
         circle.setPosition({
 
             // get the X and the Y from each particle
             static_cast<float>(particle.GetXPos()),
-            static_cast<float>(particle.GetYPos())
-        });
+            static_cast<float>(particle.GetYPos())});
 
         // If the particle's charge is positive, then make it blue
-        if (particle.GetCharge() > 0) {
+        if (particle.GetCharge() > 0)
+        {
             circle.setFillColor(sf::Color::Cyan);
-        
-        // If the particle's charge is negative, then make it red
-        } else if (particle.GetCharge() < 0) {
+
+            // If the particle's charge is negative, then make it red
+        }
+        else if (particle.GetCharge() < 0)
+        {
             circle.setFillColor(sf::Color::Red);
 
-        // If the particle has no charge, then make it white
-        } else {
+            // If the particle has no charge, then make it white
+        }
+        else
+        {
             circle.setFillColor(sf::Color::White);
         }
 
@@ -105,15 +129,18 @@ void Simulation::Draw(sf::RenderWindow& window) const {
 };
 
 // Print all particles to terminal
-void Simulation::PrintParticles() const {
-    for (const Particle& particle : particles) {
+void Simulation::PrintParticles() const
+{
+    for (const Particle &particle : particles)
+    {
         particle.Print();
         std::cout << std::endl;
     }
 }
 
 // Helper function: get dx and dy easily
-Vector2D Simulation::GetDeltaDistances(int particle1, int particle2) const{
+Vector2D Simulation::GetDeltaDistances(int particle1, int particle2) const
+{
     double dx = particles[particle2].GetXPos() - particles[particle1].GetXPos();
     double dy = particles[particle2].GetYPos() - particles[particle1].GetYPos();
 
@@ -121,7 +148,8 @@ Vector2D Simulation::GetDeltaDistances(int particle1, int particle2) const{
 }
 
 // Boundaries ensure that the particles do not move off the screen
-void Simulation::HandleBoundaries(Particle& particle) {
+void Simulation::HandleBoundaries(Particle &particle)
+{
     double x = particle.GetXPos();
     double y = particle.GetYPos();
 
@@ -131,42 +159,49 @@ void Simulation::HandleBoundaries(Particle& particle) {
     double r = particle.GetRadius();
 
     // Left wall. If the x position of the particle minus radius is less than 0 (left limit of width)
-    if (x - r < 0.0) {
+    if (x - r < 0.0)
+    {
         // reverse the direction of vx
         particle.SetPosition(r, y);
         particle.SetVelocity(-vx, vy);
     }
 
     // Right wall
-    if (x + r > width) {
+    if (x + r > width)
+    {
         particle.SetPosition(width - r, y);
         particle.SetVelocity(-vx, vy);
     }
 
     // Top wall
-    if (y - r < 0.0) {
+    if (y - r < 0.0)
+    {
         // reverse the direction of vx
         particle.SetPosition(x, r);
         particle.SetVelocity(vx, -vy);
     }
 
     // Bottom wall
-    if (y + r > height) {
+    if (y + r > height)
+    {
         particle.SetPosition(x, height - r);
         particle.SetVelocity(vx, -vy);
     }
 }
 
 // Coulomb's force shows how charged particles should react to each other
-void Simulation::ApplyCoulombForces(double dt) {
+void Simulation::ApplyCoulombForces(double dt)
+{
 
     // Use the dummy coulomb's constant first
     double k = dummyCoulomb;
 
     // Pick particle i first
-    for (size_t i = 0; i < particles.size(); i++) {
+    for (size_t i = 0; i < particles.size(); i++)
+    {
         // Pick particle j, which is every other particle that is NOT i
-        for (size_t j = i + 1; j < particles.size(); j++) {
+        for (size_t j = i + 1; j < particles.size(); j++)
+        {
             // get the distance between particles
             double dx = particles[j].GetXPos() - particles[i].GetXPos();
             double dy = particles[j].GetYPos() - particles[i].GetYPos();
@@ -174,7 +209,8 @@ void Simulation::ApplyCoulombForces(double dt) {
             // Clamp tiny separations to keep Coulomb force finite and stable.
             double distanceSquared = dx * dx + dy * dy;
             double minDistanceSquared = minDistanceClamp * minDistanceClamp;
-            if (distanceSquared < minDistanceSquared) {
+            if (distanceSquared < minDistanceSquared)
+            {
                 distanceSquared = minDistanceSquared;
             }
 
@@ -204,10 +240,13 @@ void Simulation::ApplyCoulombForces(double dt) {
 }
 
 // This function will ensure particles stick together and not phase through each other
-void Simulation::HandleParticleCollisions() {
-    for (size_t i = 0; i < particles.size(); i++) {
-        for (size_t j = i + 1; j < particles.size(); j++) {
-            
+void Simulation::HandleParticleCollisions()
+{
+    for (size_t i = 0; i < particles.size(); i++)
+    {
+        for (size_t j = i + 1; j < particles.size(); j++)
+        {
+
             // initialize a vector object
             Vector2D delta = GetDeltaDistances(i, j);
 
@@ -218,7 +257,8 @@ void Simulation::HandleParticleCollisions() {
 
             // if the distance is greater than 0.0 and less than the minimum distances
             // Then the particles interact with each other
-            if (distance > 0.0 && distance < minDistance) {
+            if (distance > 0.0 && distance < minDistance)
+            {
 
                 // Normalize the vectors
                 Vector2D direction = delta.Normalized();
@@ -228,20 +268,19 @@ void Simulation::HandleParticleCollisions() {
                 // Push particle i backward
                 particles[i].SetPosition(
                     particles[i].GetXPos() - direction.GetX() * overlap / 2.0,
-                    particles[i].GetYPos() - direction.GetY() * overlap / 2.0
-                );
+                    particles[i].GetYPos() - direction.GetY() * overlap / 2.0);
 
                 // Push particle j forward
                 particles[j].SetPosition(
                     particles[j].GetXPos() + direction.GetX() * overlap / 2.0,
-                    particles[j].GetYPos() + direction.GetY() * overlap / 2.0
-                );
+                    particles[j].GetYPos() + direction.GetY() * overlap / 2.0);
 
                 double q1 = particles[i].GetCharge();
                 double q2 = particles[j].GetCharge();
 
                 // If the charges are opposite, then they need to stick together
-                if (q1 * q2 < 0.0) {
+                if (q1 * q2 < 0.0)
+                {
 
                     // Get the information for an inelastic collision
                     double m1 = particles[i].GetMass();
@@ -264,4 +303,68 @@ void Simulation::HandleParticleCollisions() {
             }
         }
     }
+}
+
+int Simulation::GetParticleCount() const
+{
+    return particles.size();
+}
+
+int Simulation::GetMaxParticles() const
+{
+    return maxParticles;
+}
+
+bool Simulation::IsFull() const
+{
+    return particles.size() >= maxParticles;
+}
+
+// Max particle controls
+
+void Simulation::SetMaxParticles(int newMaxParticles)
+{
+
+    // if the new max particles is negative, then new particles is just 0
+    if (newMaxParticles < 0)
+    {
+        maxParticles = 0;
+    }
+
+    // If the user wishes to change the number of max particles
+    else
+    {
+        maxParticles = newMaxParticles;
+    }
+}
+
+void Simulation::IncreaseMaxParticles(int amount) {
+    
+    // If user input amount of particles is more than the maxParticles, increase
+    if (amount > 0) {
+        maxParticles -= amount;
+
+        if (maxParticles < 0) {
+            maxParticles = 0;
+        }
+    }
+}
+
+void Simulation::DecreaseMaxParticles(int amount) {
+    if (amount > 0) {
+        maxParticles -= amount;
+
+
+        // Make sure the max particles is not negative
+        if (maxParticles < 0) {
+            maxParticles = 0;
+        }
+    }
+}
+
+// Clear the particles
+void Simulation::ClearParticles() {
+
+    // remove the particles
+    particles.clear();
 }

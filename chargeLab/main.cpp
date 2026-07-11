@@ -3,6 +3,37 @@
 #include "src/Particle.h"
 #include "src/Simulation.h"
 #include <vector>
+#include <random>
+#include <string>
+
+// Temporary random particle generator
+Particle CreateRandomParticle(int particleNumber, double worldWidth, double worldHeight) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+
+    std::uniform_real_distribution<double> xDist(50.0, worldWidth - 50.0);
+    std::uniform_real_distribution<double> yDist(50.0, worldHeight - 50.0);
+    std::uniform_real_distribution<double> vDist(-80.0, 80.0);
+    std::uniform_int_distribution<int> chargeDist(0, 1);
+
+    Particle p;
+
+    p.SetName("Particle " + std::to_string(particleNumber));
+    p.SetMass(10.0);
+    p.SetRadius(15.0);
+
+    if (chargeDist(gen) == 0) {
+        p.SetCharge(-1.0);
+    }
+    else {
+        p.SetCharge(1.0);
+    }
+
+    p.SetPosition(xDist(gen), yDist(gen));
+    p.SetVelocity(vDist(gen), vDist(gen));
+
+    return p;
+}
 
 int main() {
     std::cout << "ChargeLab Starting..." << std::endl;
@@ -52,6 +83,10 @@ int main() {
     // Print the particles that were made
     simulation.PrintParticles();
     
+    // Debug print the max particles allowed in simulation
+    std::cout << "Number of particles in simulation: ";
+    std::cout << simulation.GetParticleCount() << "/" << simulation.GetMaxParticles() << std::endl;
+
     // Main loop
     while (window.isOpen()) {
         double dt = clock.restart().asSeconds();
@@ -62,8 +97,39 @@ int main() {
             }
 
             if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+
+                // Space bar: Pause and unpause the simulation
                 if (keyPressed->code == sf::Keyboard::Key::Space) {
                     simulation.TogglePaused();
+                }
+
+                // C: clear the particles
+                if (keyPressed->code == sf::Keyboard::Key::C) {
+                    simulation.ClearParticles();
+                    std::cout << "Cleared all particles" << std::endl;
+                }
+
+                // A: add particle
+                if (keyPressed->code == sf::Keyboard::Key::A) {
+                    // particle number plus 1 bc 0-indexed
+                    int nextParticleNumber = simulation.GetParticleCount() + 1;
+
+                    Particle newParticle = CreateRandomParticle(nextParticleNumber, 900.0, 700.0);
+
+                    if (simulation.AddParticle(newParticle)) {
+                        std::cout << "Added particle. Count: "
+                                << simulation.GetParticleCount()
+                                << "/"
+                                << simulation.GetMaxParticles()
+                                << std::endl;
+                    }
+                    else {
+                        std::cout << "Cannot add particle. Simulation full: "
+                                << simulation.GetParticleCount()
+                                << "/"
+                                << simulation.GetMaxParticles()
+                                << std::endl;
+                    }
                 }
             }
         }
