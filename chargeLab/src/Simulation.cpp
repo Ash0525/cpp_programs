@@ -97,8 +97,12 @@ void Simulation::Update(double dt)
 // Draw simulation particles
 void Simulation::Draw(sf::RenderWindow &window) const
 {
-    for (const Particle &particle : particles)
+    for (size_t i = 0; i < particles.size(); i++)
     {
+        // Initilaize a particle
+        const Particle& particle = particles[i];
+
+        // Get an individual particle from the vector of particles
         double radius = particle.GetRadius();
 
         // Declare circle object for every particle
@@ -129,6 +133,12 @@ void Simulation::Draw(sf::RenderWindow &window) const
         else
         {
             circle.setFillColor(sf::Color::White);
+        }
+
+        // If the user selects a particle, then draw a yellow line around it
+        if (static_cast<int>(i) == selectedParticleIndex) {
+            circle.setOutlineThickness(4.0f);
+            circle.setOutlineColor(sf::Color::Yellow);
         }
 
         window.draw(circle);
