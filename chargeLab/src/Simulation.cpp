@@ -18,6 +18,9 @@ Simulation::Simulation()
 
     // Max particles
     maxParticles = 10;
+
+    // Selected Particle status
+    selectedParticleIndex = -1;
 };
 
 // Custom size for simulation
@@ -33,6 +36,9 @@ Simulation::Simulation(double width, double height)
     paused = false;
 
     maxParticles = 10;
+
+    // Selected Particle status
+    selectedParticleIndex = -1;
 }
 
 void Simulation::TogglePaused()
@@ -339,45 +345,53 @@ void Simulation::SetMaxParticles(int newMaxParticles)
     }
 }
 
-void Simulation::IncreaseMaxParticles(int amount) {
-    
+void Simulation::IncreaseMaxParticles(int amount)
+{
+
     // If user input amount of particles is more than the maxParticles, increase
-    if (amount > 0) {
+    if (amount > 0)
+    {
         maxParticles -= amount;
 
-        if (maxParticles < 0) {
+        if (maxParticles < 0)
+        {
             maxParticles = 0;
         }
     }
 }
 
-void Simulation::DecreaseMaxParticles(int amount) {
-    if (amount > 0) {
+void Simulation::DecreaseMaxParticles(int amount)
+{
+    if (amount > 0)
+    {
         maxParticles -= amount;
 
-
         // Make sure the max particles is not negative
-        if (maxParticles < 0) {
+        if (maxParticles < 0)
+        {
             maxParticles = 0;
         }
     }
 }
 
 // Clear the particles
-void Simulation::ClearParticles() {
+void Simulation::ClearParticles()
+{
 
     // remove the particles
     particles.clear();
 }
 
-bool Simulation::AddParticleAt(double x, double y, double charge) {
-    
+bool Simulation::AddParticleAt(double x, double y, double charge)
+{
+
     // Return particle, user defined position and charge
     return AddParticleAt(x, y, charge, 10.0, 15.0);
 }
 
-bool Simulation::AddParticleAt(double x, double y, double charge, double mass, double radius) {
-    
+bool Simulation::AddParticleAt(double x, double y, double charge, double mass, double radius)
+{
+
     // Initialize a new particle object
     Particle newParticle;
 
@@ -389,5 +403,35 @@ bool Simulation::AddParticleAt(double x, double y, double charge, double mass, d
     newParticle.SetVelocity(0.0, 0.0);
 
     return AddParticle(newParticle);
+}
 
+// Define select particle at
+bool Simulation::SelectedParticleAt(double x, double y) {
+    selectedParticleIndex = -1;
+
+    // Initialize a vector object
+    Vector2D clickPosition(x, y);
+
+    for (int i = static_cast<int>(particles.size()) - 1; i >= 0; i--) {
+
+        // Note where the particle is
+        Vector2D particlePosition(
+            particles[i].GetXPos(),
+            particles[i].GetYPos()
+        );
+
+        Vector2D delta = clickPosition - particlePosition;
+
+        // Get the distance squared. If the delta between the click position and the particle
+        // position is within the radius, then the user clicked the particle
+        double distanceSquared = delta.MagnitudeSquared();
+        double radius = particles[i].GetRadius();
+
+        if (distanceSquared <= radius * radius) {
+
+            // You've selected the i'th particle
+            selectedParticleIndex = i;
+            return true;
+        }
+    }
 }

@@ -36,6 +36,12 @@ class Simulation {
 
         bool AddParticleAt(double x, double y, double charge);
         bool AddParticleAt(double x, double y, double charge, double mass, double radius);
+
+        // Select particles
+        bool SelectedParticleAt(double x, double y);
+        void ClearSelectedParticle();
+        bool HasSelectedParticle() const;
+        int GetSelectedParticleIndex() const;
         
         
     private:
@@ -55,7 +61,8 @@ class Simulation {
         // Get the delta distances
         Vector2D GetDeltaDistances(int particle1, int particle2) const;
 
-        //
+        // Selected particle index lets the program know if a particle was selected
+        int selectedParticleIndex;
 
         // vector list of particles
         std::vector<Particle> particles;
