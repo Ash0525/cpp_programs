@@ -35,9 +35,19 @@ int main() {
     p2.SetPosition(350.0, 250.0);
     p2.SetVelocity(0.0, 0.0);
 
+    Particle p3;
+    p3.SetName("SomeRandomDude");
+    p3.SetMass(50.0);
+    p3.SetCharge(+4.0);
+    p3.SetRadius(20.0);
+    p3.SetPosition(370.0, 250.0);
+    p3.SetVelocity(-100.0, 0.0);
+
+
     // Add the particles to the simulation
     simulation.AddParticle(p1);
     simulation.AddParticle(p2);
+    simulation.AddParticle(p3);
 
     // Print the particles that were made
     simulation.PrintParticles();

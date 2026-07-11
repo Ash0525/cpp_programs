@@ -3,6 +3,7 @@
 #include <cmath>
 #include "Particle.h"
 #include "Simulation.h"
+#include "Vector2D.h"
 
 // Default simulation size
 Simulation::Simulation() {
@@ -28,6 +29,7 @@ void Simulation::AddParticle(const Particle& newParticle) {
 void Simulation::Update(double dt) {
     // Initialize the force
     ApplyCoulombForces(dt);
+    HandleParticleCollisions();
 
     for (Particle& particle : particles) {
         // Move the particles
@@ -172,7 +174,60 @@ void Simulation::HandleParticleCollisions() {
     for (size_t i = 0; i < particles.size(); i++) {
         for (size_t j = i + 1; j < particles.size(); j++) {
             
+            // initialize a vector object
+            Vector2D delta = GetDeltaDistances(i, j);
 
+            double distance = delta.Magnitude();
+
+            // minimum distance the particles need to be apart in order to bounce
+            double minDistance = particles[i].GetRadius() + particles[j].GetRadius();
+
+            // if the distance is greater than 0.0 and less than the minimum distances
+            // Then the particles interact with each other
+            if (distance > 0.0 && distance < minDistance) {
+
+                // Normalize the vectors
+                Vector2D direction = delta.Normalized();
+
+                double overlap = minDistance - distance;
+
+                // Push particle i backward
+                particles[i].SetPosition(
+                    particles[i].GetXPos() - direction.GetX() * overlap / 2.0,
+                    particles[i].GetYPos() - direction.GetY() * overlap / 2.0
+                );
+
+                // Push particle j forward
+                particles[j].SetPosition(
+                    particles[j].GetXPos() + direction.GetX() * overlap / 2.0,
+                    particles[j].GetYPos() + direction.GetY() * overlap / 2.0
+                );
+
+                double q1 = particles[i].GetCharge();
+                double q2 = particles[j].GetCharge();
+
+                // If the charges are opposite, then they need to stick together
+                if (q1 * q2 < 0.0) {
+
+                    // Get the information for an inelastic collision
+                    double m1 = particles[i].GetMass();
+                    double m2 = particles[j].GetMass();
+
+                    double vx1 = particles[i].GetVX();
+                    double vy1 = particles[i].GetVY();
+
+                    double vx2 = particles[j].GetVX();
+                    double vy2 = particles[j].GetVY();
+
+                    // Find the final velocity after inelastic collision (momentum)
+                    double finalVx = ((m1 * vx1) + (m2 * vx2)) / (m1 + m2);
+                    double finalVy = ((m1 * vy1) + (m2 * vy2)) / (m1 + m2);
+
+                    // Set the velocity for the inelastic collision
+                    particles[i].SetVelocity(finalVx, finalVy);
+                    particles[j].SetVelocity(finalVx, finalVy);
+                }
+            }
         }
     }
 }
