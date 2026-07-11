@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "stage sfml dlls to lib",
+			"type": "shell",
+			"command": "cmd",
+			"args": [
+				"/C",
+				"copy /Y \"C:\\msys64\\mingw64\\bin\\libsfml-graphics-3.dll\" \"lib\\libsfml-graphics-3.dll\" && copy /Y \"C:\\msys64\\mingw64\\bin\\libsfml-window-3.dll\" \"lib\\libsfml-window-3.dll\" && copy /Y \"C:\\msys64\\mingw64\\bin\\libsfml-system-3.dll\" \"lib\\libsfml-system-3.dll\""
+			],
+			"isBackground": false
+		}
+	]
+}
