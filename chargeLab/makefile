@@ -23,8 +23,7 @@ TARGET := run$(EXEEXT)
 SRCS := main.cpp \
 	src/Vector2D.cpp \
 	src/Particle.cpp \
-	src/Simulation.cpp \
-	src/SimulationTester.cpp
+	src/Simulation.cpp
 
 # Object files
 OBJS := $(SRCS:.cpp=.o)
@@ -42,8 +41,4 @@ $(TARGET): $(OBJS)
 
 # clean rule to remove generated files
 clean:
-ifeq ($(OS),Windows_NT)
-	del /q $(TARGET) $(OBJS) 2>nul
-else
-	rm -f $(TARGET) $(OBJS)
-endif
+	cmd /C "for %f in (\"$(TARGET)\" $(OBJS:%=\"%\")) do @if exist %f del /Q %f"

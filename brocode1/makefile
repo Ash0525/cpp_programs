@@ -33,4 +33,4 @@ $(TARGET1) : $(OBJS1)
 
 # clean rule to remove generated files
 clean:
-	rm -f $(TARGET1) $(OBJS1) $(OBJS2)
+	cmd /C "for %f in (\"$(TARGET1)\" $(OBJS1:%=\"%\")) do @if exist %f del /Q %f"

@@ -60,6 +60,12 @@ int main() {
             if (event->is<sf::Event::Closed>()) {
                 window.close();
             }
+
+            if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+                if (keyPressed->code == sf::Keyboard::Key::Space) {
+                    simulation.TogglePaused();
+                }
+            }
         }
 
         simulation.Update(dt);

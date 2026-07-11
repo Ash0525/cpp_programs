@@ -71,7 +71,7 @@ Vector2D Vector2D::operator+(const Vector2D& other) const {
 Vector2D Vector2D::operator-(const Vector2D& other) const {
 
     // Subtract the x and y components of two components
-    return Vector2D(x + other.x, y + other.y);
+    return Vector2D(x - other.x, y - other.y);
 }
 
 // Scalar multiplication 

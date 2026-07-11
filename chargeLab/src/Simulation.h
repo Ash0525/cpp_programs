@@ -17,6 +17,11 @@ class Simulation {
         void Update(double dt);
         void Draw(sf::RenderWindow& window) const;
         void PrintParticles() const;
+
+        // Add pause toggle for window
+        void TogglePaused();
+        void SetPaused(bool newPaused);
+        bool IsPaused() const;
         
         
     private:
@@ -50,4 +55,5 @@ class Simulation {
         // width and height to set boundaries for box
         double width;
         double height;
+        bool paused;
 };

@@ -9,6 +9,10 @@
 Simulation::Simulation() {
     width = 900.0;
     height = 700.0;
+    minDistanceClamp = 20.0;
+
+    // Add pause default
+    paused = false;
 };
 
 // Custom size for simulation
@@ -17,6 +21,22 @@ Simulation::Simulation(double width, double height) {
     // update the width and height in private
     this->width = width;
     this->height = height;
+    minDistanceClamp = 20.0;
+
+    // Add puase defualt
+    paused = false;
+}
+
+void Simulation::TogglePaused() {
+    paused = !paused;
+}
+
+void Simulation::SetPaused(bool newPaused) {
+    paused = newPaused;
+}
+
+bool Simulation::IsPaused() const {
+    return paused;
 }
 
 void Simulation::AddParticle(const Particle& newParticle) {
@@ -27,10 +47,15 @@ void Simulation::AddParticle(const Particle& newParticle) {
 
 // Update function will update the physics of the simulation
 void Simulation::Update(double dt) {
+
+    // If paused, then return
+    if (paused) {
+        return;
+    }
+    
     // Initialize the force
     ApplyCoulombForces(dt);
-    HandleParticleCollisions();
-
+    
     for (Particle& particle : particles) {
         // Move the particles
         particle.Move(dt);
@@ -38,6 +63,8 @@ void Simulation::Update(double dt) {
         // When the particles hit the wall, HandleBoundaries
         HandleBoundaries(particle);
     }
+
+    HandleParticleCollisions();
 };
 
 // Draw simulation particles
@@ -123,10 +150,10 @@ void Simulation::HandleBoundaries(Particle& particle) {
         particle.SetVelocity(vx, -vy);
     }
 
-    // Right wall
+    // Bottom wall
     if (y + r > height) {
         particle.SetPosition(x, height - r);
-        particle.SetVelocity(-vx, -vy);
+        particle.SetVelocity(vx, -vy);
     }
 }
 
@@ -144,8 +171,15 @@ void Simulation::ApplyCoulombForces(double dt) {
             double dx = particles[j].GetXPos() - particles[i].GetXPos();
             double dy = particles[j].GetYPos() - particles[i].GetYPos();
 
+            // Clamp tiny separations to keep Coulomb force finite and stable.
+            double distanceSquared = dx * dx + dy * dy;
+            double minDistanceSquared = minDistanceClamp * minDistanceClamp;
+            if (distanceSquared < minDistanceSquared) {
+                distanceSquared = minDistanceSquared;
+            }
+
             // use pythagorean theorem to get the distance
-            double distance = std::sqrt(dx * dx + dy * dy);
+            double distance = std::sqrt(distanceSquared);
 
             // get the x and y components, make them normalized. they will be used for direction
             double unitX = dx / distance;
@@ -156,7 +190,7 @@ void Simulation::ApplyCoulombForces(double dt) {
             double q2 = particles[j].GetCharge();
 
             // Apply coulomb's force
-            double coulombLaw = -k * q1 * q2 / (distance * distance);
+            double coulombLaw = -k * q1 * q2 / distanceSquared;
 
             // Get the direction of the force
             double fx = coulombLaw * unitX;
