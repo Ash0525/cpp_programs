@@ -3,6 +3,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "Particle.h"
+#include "Vector2D.h"
 
 class Simulation {
     public: 
@@ -26,8 +27,16 @@ class Simulation {
         // Apply boundary so particle does not go off the map
         void HandleBoundaries(Particle& particle);
 
+        // Handle particle collisions
+        void HandleParticleCollisions();
+
         // Coulomb's Force
         void ApplyCoulombForces(double dt);
+
+        // Get the delta distances
+        Vector2D GetDeltaDistances(int particle1, int particle2) const;
+
+        //
 
         // vector list of particles
         std::vector<Particle> particles;

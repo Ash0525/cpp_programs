@@ -83,6 +83,14 @@ void Simulation::PrintParticles() const {
     }
 }
 
+// Helper function: get dx and dy easily
+Vector2D Simulation::GetDeltaDistances(int particle1, int particle2) const{
+    double dx = particles[particle2].GetXPos() - particles[particle1].GetXPos();
+    double dy = particles[particle2].GetYPos() - particles[particle1].GetYPos();
+
+    return Vector2D(dx, dy);
+}
+
 // Boundaries ensure that the particles do not move off the screen
 void Simulation::HandleBoundaries(Particle& particle) {
     double x = particle.GetXPos();
@@ -155,6 +163,16 @@ void Simulation::ApplyCoulombForces(double dt) {
             // Apply the force
             particles[i].ApplyForce(fx, fy, dt);
             particles[j].ApplyForce(-fx, -fy, dt);
+        }
+    }
+}
+
+// This function will ensure particles stick together and not phase through each other
+void Simulation::HandleParticleCollisions() {
+    for (size_t i = 0; i < particles.size(); i++) {
+        for (size_t j = i + 1; j < particles.size(); j++) {
+            
+
         }
     }
 }
