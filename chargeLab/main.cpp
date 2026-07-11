@@ -144,6 +144,7 @@ int main()
                     }
                 }
 
+                // Num1: if the number 1 is pressed, add a positive particle
                 if (keyPressed->code == sf::Keyboard::Key::Num1)
                 {
                     // The mouse has to be in the window
@@ -163,6 +164,7 @@ int main()
                     }
                 }
                 
+                // Num2: If the number 2 is pressed, add a negative particle
                 if (keyPressed->code == sf::Keyboard::Key::Num2)
                 {
                     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
@@ -178,6 +180,25 @@ int main()
                     else
                     {
                         std::cout << "Simulation full." << std::endl;
+                    }
+                }
+            }
+            // Clicking functions
+            // Left-click: if the left mouse button is pressed, select a particle
+            if (const auto* mousePressed = event->getIf<sf::Event::MouseButtonPressed>()) {
+                if (mousePressed->button == sf::Mouse::Button::Left) {
+                    // Make sure the mouse is within the SFML window
+                    sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+                    
+                        // If the mouse is in the simulation window AND user clicked within the particle
+                    if (simulation.SelectedParticleAt(mousePosition.x, mousePosition.y)) {
+                        std::cout << "Selected particle index: "
+                                << simulation.GetSelectedParticleIndex()
+                                << std::endl;
+                    }
+
+                    else {
+                        std::cout << "No particle selected." << std::endl;
                     }
                 }
             }
