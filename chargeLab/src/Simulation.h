@@ -33,6 +33,9 @@ class Simulation {
         void IncreaseMaxParticles(int amount);
         void DecreaseMaxParticles(int amount);
         bool IsFull() const;
+
+        bool AddParticleAt(double x, double y, double charge);
+        bool AddParticleAt(double x, double y, double charge, double mass, double radius);
         
         
     private:

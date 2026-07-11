@@ -7,7 +7,8 @@
 #include <string>
 
 // Temporary random particle generator
-Particle CreateRandomParticle(int particleNumber, double worldWidth, double worldHeight) {
+Particle CreateRandomParticle(int particleNumber, double worldWidth, double worldHeight)
+{
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
@@ -22,10 +23,12 @@ Particle CreateRandomParticle(int particleNumber, double worldWidth, double worl
     p.SetMass(10.0);
     p.SetRadius(15.0);
 
-    if (chargeDist(gen) == 0) {
+    if (chargeDist(gen) == 0)
+    {
         p.SetCharge(-1.0);
     }
-    else {
+    else
+    {
         p.SetCharge(1.0);
     }
 
@@ -35,7 +38,8 @@ Particle CreateRandomParticle(int particleNumber, double worldWidth, double worl
     return p;
 }
 
-int main() {
+int main()
+{
     std::cout << "ChargeLab Starting..." << std::endl;
     // Recreating main but with the Simulation instead of making individual particles
 
@@ -74,7 +78,6 @@ int main() {
     p3.SetPosition(370.0, 250.0);
     p3.SetVelocity(-100.0, 0.0);
 
-
     // Add the particles to the simulation
     simulation.AddParticle(p1);
     simulation.AddParticle(p2);
@@ -82,65 +85,112 @@ int main() {
 
     // Print the particles that were made
     simulation.PrintParticles();
-    
+
     // Debug print the max particles allowed in simulation
     std::cout << "Number of particles in simulation: ";
     std::cout << simulation.GetParticleCount() << "/" << simulation.GetMaxParticles() << std::endl;
 
     // Main loop
-    while (window.isOpen()) {
+    while (window.isOpen())
+    {
         double dt = clock.restart().asSeconds();
 
-        while (const std::optional event = window.pollEvent()) {
-            if (event->is<sf::Event::Closed>()) {
+        while (const std::optional event = window.pollEvent())
+        {
+            if (event->is<sf::Event::Closed>())
+            {
                 window.close();
             }
 
-            if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>()) {
+            if (const auto *keyPressed = event->getIf<sf::Event::KeyPressed>())
+            {
 
                 // Space bar: Pause and unpause the simulation
-                if (keyPressed->code == sf::Keyboard::Key::Space) {
+                if (keyPressed->code == sf::Keyboard::Key::Space)
+                {
                     simulation.TogglePaused();
                 }
 
                 // C: clear the particles
-                if (keyPressed->code == sf::Keyboard::Key::C) {
+                if (keyPressed->code == sf::Keyboard::Key::C)
+                {
                     simulation.ClearParticles();
                     std::cout << "Cleared all particles" << std::endl;
                 }
 
                 // A: add particle
-                if (keyPressed->code == sf::Keyboard::Key::A) {
+                if (keyPressed->code == sf::Keyboard::Key::A)
+                {
                     // particle number plus 1 bc 0-indexed
                     int nextParticleNumber = simulation.GetParticleCount() + 1;
 
                     Particle newParticle = CreateRandomParticle(nextParticleNumber, 900.0, 700.0);
 
-                    if (simulation.AddParticle(newParticle)) {
+                    if (simulation.AddParticle(newParticle))
+                    {
                         std::cout << "Added particle. Count: "
-                                << simulation.GetParticleCount()
-                                << "/"
-                                << simulation.GetMaxParticles()
-                                << std::endl;
+                                  << simulation.GetParticleCount()
+                                  << "/"
+                                  << simulation.GetMaxParticles()
+                                  << std::endl;
                     }
-                    else {
+                    else
+                    {
                         std::cout << "Cannot add particle. Simulation full: "
-                                << simulation.GetParticleCount()
-                                << "/"
-                                << simulation.GetMaxParticles()
-                                << std::endl;
+                                  << simulation.GetParticleCount()
+                                  << "/"
+                                  << simulation.GetMaxParticles()
+                                  << std::endl;
+                    }
+                }
+
+                if (keyPressed->code == sf::Keyboard::Key::Num1)
+                {
+                    // The mouse has to be in the window
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                    if (simulation.AddParticleAt(mousePos.x, mousePos.y, 1.0))
+                    {
+                        std::cout << "Added positive particle: "
+                                  << simulation.GetParticleCount()
+                                  << "/"
+                                  << simulation.GetMaxParticles()
+                                  << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "Simulation full." << std::endl;
+                    }
+                }
+                
+                if (keyPressed->code == sf::Keyboard::Key::Num2)
+                {
+                    sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                    if (simulation.AddParticleAt(mousePos.x, mousePos.y, -1.0))
+                    {
+                        std::cout << "Added negative particle: "
+                                    << simulation.GetParticleCount()
+                                    << "/"
+                                    << simulation.GetMaxParticles()
+                                    << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "Simulation full." << std::endl;
                     }
                 }
             }
         }
 
+        // Update the simulation
         simulation.Update(dt);
 
         window.clear(sf::Color::Black);
         simulation.Draw(window);
         window.display();
     }
-    
+
     std::cout << "Program ended." << std::endl;
     return 0;
 }

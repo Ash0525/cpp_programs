@@ -4,6 +4,7 @@
 #include "Particle.h"
 #include "Simulation.h"
 #include "Vector2D.h"
+#include <string>
 
 // Default simulation size
 Simulation::Simulation()
@@ -367,4 +368,26 @@ void Simulation::ClearParticles() {
 
     // remove the particles
     particles.clear();
+}
+
+bool Simulation::AddParticleAt(double x, double y, double charge) {
+    
+    // Return particle, user defined position and charge
+    return AddParticleAt(x, y, charge, 10.0, 15.0);
+}
+
+bool Simulation::AddParticleAt(double x, double y, double charge, double mass, double radius) {
+    
+    // Initialize a new particle object
+    Particle newParticle;
+
+    newParticle.SetName("Particle " + std::to_string(GetParticleCount() + 1));
+    newParticle.SetMass(mass);
+    newParticle.SetCharge(charge);
+    newParticle.SetRadius(radius);
+    newParticle.SetPosition(x, y);
+    newParticle.SetVelocity(0.0, 0.0);
+
+    return AddParticle(newParticle);
+
 }
