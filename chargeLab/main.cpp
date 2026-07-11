@@ -25,7 +25,7 @@ int main() {
     p1.SetCharge(1.0);
     p1.SetRadius(20.0);
     p1.SetPosition(250.0, 150.0);
-    p1.SetVelocity(150.0, 15.0);
+    p1.SetVelocity(0.0, 0.0);
 
     Particle p2;
     p2.SetName("Negative");
@@ -33,7 +33,7 @@ int main() {
     p2.SetCharge(-1.0);
     p2.SetRadius(20.0);
     p2.SetPosition(350.0, 250.0);
-    p2.SetVelocity(100.0, 50.0);
+    p2.SetVelocity(0.0, 0.0);
 
     // Add the particles to the simulation
     simulation.AddParticle(p1);

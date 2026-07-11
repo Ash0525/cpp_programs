@@ -1,5 +1,6 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include <cmath>
 #include "Particle.h"
 #include "Simulation.h"
 
@@ -25,6 +26,9 @@ void Simulation::AddParticle(const Particle& newParticle) {
 
 // Update function will update the physics of the simulation
 void Simulation::Update(double dt) {
+    // Initialize the force
+    ApplyCoulombForces(dt);
+
     for (Particle& particle : particles) {
         // Move the particles
         particle.Move(dt);
@@ -113,5 +117,44 @@ void Simulation::HandleBoundaries(Particle& particle) {
     if (y + r > height) {
         particle.SetPosition(x, height - r);
         particle.SetVelocity(-vx, -vy);
+    }
+}
+
+// Coulomb's force shows how charged particles should react to each other
+void Simulation::ApplyCoulombForces(double dt) {
+
+    // Use the dummy coulomb's constant first
+    double k = dummyCoulomb;
+
+    // Pick particle i first
+    for (size_t i = 0; i < particles.size(); i++) {
+        // Pick particle j, which is every other particle that is NOT i
+        for (size_t j = i + 1; j < particles.size(); j++) {
+            // get the distance between particles
+            double dx = particles[j].GetXPos() - particles[i].GetXPos();
+            double dy = particles[j].GetYPos() - particles[i].GetYPos();
+
+            // use pythagorean theorem to get the distance
+            double distance = std::sqrt(dx * dx + dy * dy);
+
+            // get the x and y components, make them normalized. they will be used for direction
+            double unitX = dx / distance;
+            double unitY = dy / distance;
+
+            // Get the charge of each particle
+            double q1 = particles[i].GetCharge();
+            double q2 = particles[j].GetCharge();
+
+            // Apply coulomb's force
+            double coulombLaw = -k * q1 * q2 / (distance * distance);
+
+            // Get the direction of the force
+            double fx = coulombLaw * unitX;
+            double fy = coulombLaw * unitY;
+
+            // Apply the force
+            particles[i].ApplyForce(fx, fy, dt);
+            particles[j].ApplyForce(-fx, -fy, dt);
+        }
     }
 }
