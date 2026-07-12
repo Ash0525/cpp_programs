@@ -50,6 +50,7 @@ int main()
 
     // Make a simulation object
     Simulation simulation(900.0, 700.0);
+    bool isDraggingSelected = false;
 
     // Start clock
     sf::Clock clock;
@@ -193,6 +194,9 @@ int main()
 
                     // If the mouse is in the simulation window AND user clicked within the particle
                     if (simulation.SelectedParticleAt(mousePosition.x, mousePosition.y)) {
+
+                        isDraggingSelected = true;
+
                         int selectedIndex = simulation.GetSelectedParticleIndex();
                         Vector2D totalForce = simulation.GetTotalForceOnParticle(
                             selectedIndex);
@@ -215,11 +219,27 @@ int main()
                     }
 
                     else {
+                        isDraggingSelected = false;
                         simulation.ClearSelectedParticle();
                         std::cout << "No particle selected." << std::endl;
                     }
                 }
             }
+
+            // Mouse Dragging
+            if (const auto* mouseReleased = event->getIf<sf::Event::MouseButtonReleased>()) {
+                if (mouseReleased->button == sf::Mouse::Button::Left) {
+                    isDraggingSelected = false;
+                }
+            }
+        }
+
+        if (isDraggingSelected && simulation.HasSelectedParticle()) {
+            sf::Vector2i mousePixel = sf::Mouse::getPosition(window);
+            sf::Vector2f mouseWorld = window.mapPixelToCoords(mousePixel);
+
+            simulation.MoveSelected(mouseWorld.x, mouseWorld.y);
+            simulation.SetSelectedVelocity(0.0, 0.0);
         }
 
         // Update the simulation

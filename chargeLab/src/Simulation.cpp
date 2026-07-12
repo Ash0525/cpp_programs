@@ -7,6 +7,7 @@
 #include <string>
 #include <algorithm>
 
+// ===== File-local helpers =====
 namespace {
 
 double CoulombsLaw(double k, double q1, double q2, double r) {
@@ -44,6 +45,8 @@ Vector2D ComputeCoulombForceSI(
 
 }
 
+// ===== Constructors and core state =====
+
 // Default simulation size
 Simulation::Simulation()
 {
@@ -63,6 +66,9 @@ Simulation::Simulation()
 
     // Selected Particle status
     selectedParticleIndex = -1;
+
+    // User dragging particle
+    isDraggingSelected = false;
 };
 
 // Custom size for simulation
@@ -85,6 +91,9 @@ Simulation::Simulation(double width, double height)
 
     // Selected Particle status
     selectedParticleIndex = -1;
+
+    // User dragging particle
+    isDraggingSelected = false;
 }
 
 void Simulation::TogglePaused()
@@ -102,6 +111,8 @@ bool Simulation::IsPaused() const
     return paused;
 }
 
+// ===== Particle add/remove and capacity control =====
+
 bool Simulation::AddParticle(const Particle &newParticle)
 {
 
@@ -114,6 +125,8 @@ bool Simulation::AddParticle(const Particle &newParticle)
     particles.push_back(newParticle);
     return true;
 };
+
+// ===== Main simulation flow and rendering =====
 
 // Update function will update the physics of the simulation
 void Simulation::Update(double dt)
@@ -202,6 +215,8 @@ void Simulation::PrintParticles() const
         std::cout << std::endl;
     }
 }
+
+// ===== Spatial helpers and physics internals =====
 
 // Helper function: get dx and dy easily
 Vector2D Simulation::GetDeltaDistances(int particle1, int particle2) const
@@ -448,6 +463,8 @@ bool Simulation::AddParticleAt(double x, double y, double charge, double mass, d
     return AddParticle(newParticle);
 }
 
+// ===== Selection =====
+
 // Define select particle at
 bool Simulation::SelectedParticleAt(double x, double y) {
     selectedParticleIndex = -1;
@@ -494,6 +511,8 @@ bool Simulation::HasSelectedParticle() const {
 int Simulation::GetSelectedParticleIndex() const {
     return selectedParticleIndex;
 }
+
+// ===== Force analysis =====
 
 // Force Analysis
 Vector2D Simulation::GetForceBetweenParticles(int particle1, int particle2) const {
@@ -577,6 +596,8 @@ Vector2D Simulation::GetTotalForceOnParticleSI(int particleIndex) const {
 
     return totalForceSI;
 }
+
+// ===== Force vector drawing =====
 
 // Draw the force arrow
 void Simulation::DrawForceArrow(sf::RenderWindow& window, const Vector2D& startPosition, const Vector2D& force, sf::Color color, double referenceMagnitude) const {
@@ -687,4 +708,104 @@ void Simulation::DrawForces(sf::RenderWindow& window) const {
 
     DrawForceArrow(window, selectedPosition, totalForce, sf::Color::White, maxMagnitude);
 
+}
+
+// ===== Selected particle mutators =====
+
+void Simulation::MoveSelected(double x, double y) {
+    if (!HasSelectedParticle()) {
+        return;
+    }
+
+    particles[selectedParticleIndex].SetPosition(x, y);
+}
+
+void Simulation::SetSelectedVelocity(double vx, double vy) {
+    if (!HasSelectedParticle()) {
+        return;
+    }
+
+    particles[selectedParticleIndex].SetVelocity(vx, vy);
+}
+
+void Simulation::SetSelectedCharge(double charge) {
+    if (!HasSelectedParticle()) {
+        return;
+    }
+
+    particles[selectedParticleIndex].SetCharge(charge);
+}
+
+void Simulation::SetSelectedMass(double mass) {
+    if (!HasSelectedParticle()) {
+        return;
+    }
+
+    particles[selectedParticleIndex].SetMass(mass);
+}
+
+void Simulation::SetSelectedRadius(double radius) {
+    if (!HasSelectedParticle()) {
+        return;
+    }
+
+    particles[selectedParticleIndex].SetRadius(radius);
+}
+
+// ===== Selected particle accessors =====
+
+double Simulation::GetSelectedCharge() const {
+    if (!HasSelectedParticle()) {
+        return 0.0;
+    }
+
+    return particles[selectedParticleIndex].GetCharge();
+}
+
+double Simulation::GetSelectedMass() const {
+    if (!HasSelectedParticle()) {
+        return 0.0;
+    }
+
+    return particles[selectedParticleIndex].GetMass();
+}
+
+double Simulation::GetSelectedRadius() const {
+    if (!HasSelectedParticle()) {
+        return 0.0;
+    }
+
+    return particles[selectedParticleIndex].GetRadius();
+}
+
+double Simulation::GetSelectedX() const {
+    if (!HasSelectedParticle()) {
+        return 0.0;
+    }
+
+    return particles[selectedParticleIndex].GetXPos();
+}
+
+double Simulation::GetSelectedY() const {
+    if (!HasSelectedParticle()) {
+        return 0.0;
+    }
+
+    return particles[selectedParticleIndex].GetYPos();
+}
+
+double Simulation::GetSelectedVx() const {
+    if (!HasSelectedParticle()) {
+        return 0.0;
+    }
+
+    return particles[selectedParticleIndex].GetVX();
+}
+
+double Simulation::GetSelectedVy() const {
+    if (!HasSelectedParticle()) {
+        return 0.0;
+    }
+
+    return particles[selectedParticleIndex].GetVY();
 }

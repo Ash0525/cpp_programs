@@ -52,7 +52,20 @@ class Simulation {
         void DrawForces(sf::RenderWindow& window) const;
         void DrawForceArrow(sf::RenderWindow& window, const Vector2D& startPosition, const Vector2D& force, sf::Color color, double referenceMagnitude) const;
         
-        
+        // Moving particles with mouse
+        void MoveSelected(double x, double y);
+        void SetSelectedVelocity(double vx, double vy);
+        void SetSelectedCharge(double charge);
+        void SetSelectedMass(double mass);
+        void SetSelectedRadius(double radius);
+
+        double GetSelectedCharge() const;
+        double GetSelectedMass() const;
+        double GetSelectedRadius() const;
+        double GetSelectedX() const;
+        double GetSelectedY() const;
+        double GetSelectedVx() const;
+        double GetSelectedVy() const;
         
     private:
         // private functions
@@ -91,4 +104,5 @@ class Simulation {
         double height;
         bool paused;
         int maxParticles;
+        bool isDraggingSelected;
 };
