@@ -66,6 +66,12 @@ class Simulation {
         double GetSelectedY() const;
         double GetSelectedVx() const;
         double GetSelectedVy() const;
+
+        // Add Getters for renderer-simualtion split
+        double GetParticleX(int index) const;
+        double GetParticleY(int index) const;
+        double GetParticleRadius(int index) const;
+        double GetParticleCharge(int index) const;
         
     private:
         // private functions
