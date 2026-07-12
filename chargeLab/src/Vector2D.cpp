@@ -1,5 +1,6 @@
 #include "Vector2D.h"
 #include <cmath>
+#include <iostream>
 
 // Default constructor
 Vector2D::Vector2D() {

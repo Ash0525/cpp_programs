@@ -6,6 +6,7 @@
 #include "Vector2D.h"
 #include <string>
 #include <algorithm>
+#include <iostream>
 
 // ===== File-local helpers =====
 namespace {
@@ -67,8 +68,6 @@ Simulation::Simulation()
     // Selected Particle status
     selectedParticleIndex = -1;
 
-    // User dragging particle
-    isDraggingSelected = false;
 };
 
 // Custom size for simulation
@@ -92,8 +91,6 @@ Simulation::Simulation(double width, double height)
     // Selected Particle status
     selectedParticleIndex = -1;
 
-    // User dragging particle
-    isDraggingSelected = false;
 }
 
 void Simulation::TogglePaused()

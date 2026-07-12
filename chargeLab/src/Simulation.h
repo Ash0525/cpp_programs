@@ -69,9 +69,6 @@ class Simulation {
         
     private:
         // private functions
-        // Add the forces using sum of the forces
-        void ComputeForces(std::vector<double>& fx, std::vector<double>& fy) const;
-
         // Apply boundary so particle does not go off the map
         void HandleBoundaries(Particle& particle);
 
@@ -104,5 +101,4 @@ class Simulation {
         double height;
         bool paused;
         int maxParticles;
-        bool isDraggingSelected;
 };
