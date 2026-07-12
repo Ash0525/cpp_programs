@@ -5,12 +5,54 @@
 #include "Simulation.h"
 #include "Vector2D.h"
 #include <string>
+#include <algorithm>
+
+namespace {
+
+double CoulombsLaw(double k, double q1, double q2, double r) {
+    return (-k * q1 * q2) / (r * r);
+}
+
+Vector2D ComputeCoulombForceSI(
+    const Vector2D& delta,
+    double k,
+    double q1,
+    double q2,
+    double minDistanceClamp,
+    double metersPerPixel,
+    double coulombsPerChargeUnit) {
+    Vector2D deltaMeters = delta * metersPerPixel;
+    double distanceSquared = deltaMeters.MagnitudeSquared();
+    double minDistanceMeters = minDistanceClamp * metersPerPixel;
+    double minDistanceSquared = minDistanceMeters * minDistanceMeters;
+
+    if (distanceSquared < minDistanceSquared) {
+        distanceSquared = minDistanceSquared;
+    }
+
+    double distance = std::sqrt(distanceSquared);
+    if (distance == 0.0) {
+        return Vector2D(0.0, 0.0);
+    }
+
+    Vector2D direction = deltaMeters / distance;
+    double q1SI = q1 * coulombsPerChargeUnit;
+    double q2SI = q2 * coulombsPerChargeUnit;
+    double forceMagnitude = CoulombsLaw(k, q1SI, q2SI, distance);
+    return direction * forceMagnitude;
+}
+
+}
 
 // Default simulation size
 Simulation::Simulation()
 {
     width = 900.0;
     height = 700.0;
+    coulombConstant = 8.9875517923e9;
+    metersPerPixel = 0.01;
+    coulombsPerChargeUnit = 1.0e-6;
+    kilogramsPerMassUnit = 1.0e-3;
     minDistanceClamp = 20.0;
 
     // Add pause default
@@ -30,6 +72,10 @@ Simulation::Simulation(double width, double height)
     // update the width and height in private
     this->width = width;
     this->height = height;
+    coulombConstant = 8.9875517923e9;
+    metersPerPixel = 0.01;
+    coulombsPerChargeUnit = 1.0e-6;
+    kilogramsPerMassUnit = 1.0e-3;
     minDistanceClamp = 20.0;
 
     // Add puase defualt
@@ -143,6 +189,8 @@ void Simulation::Draw(sf::RenderWindow &window) const
 
         window.draw(circle);
     }
+
+    DrawForces(window);
 };
 
 // Print all particles to terminal
@@ -209,9 +257,7 @@ void Simulation::HandleBoundaries(Particle &particle)
 // Coulomb's force shows how charged particles should react to each other
 void Simulation::ApplyCoulombForces(double dt)
 {
-
-    // Use the dummy coulomb's constant first
-    double k = dummyCoulomb;
+    double newtonsToSimulationForce = 1.0 / (kilogramsPerMassUnit * metersPerPixel);
 
     // Pick particle i first
     for (size_t i = 0; i < particles.size(); i++)
@@ -219,39 +265,26 @@ void Simulation::ApplyCoulombForces(double dt)
         // Pick particle j, which is every other particle that is NOT i
         for (size_t j = i + 1; j < particles.size(); j++)
         {
-            // get the distance between particles
-            double dx = particles[j].GetXPos() - particles[i].GetXPos();
-            double dy = particles[j].GetYPos() - particles[i].GetYPos();
-
-            // Clamp tiny separations to keep Coulomb force finite and stable.
-            double distanceSquared = dx * dx + dy * dy;
-            double minDistanceSquared = minDistanceClamp * minDistanceClamp;
-            if (distanceSquared < minDistanceSquared)
-            {
-                distanceSquared = minDistanceSquared;
-            }
-
-            // use pythagorean theorem to get the distance
-            double distance = std::sqrt(distanceSquared);
-
-            // get the x and y components, make them normalized. they will be used for direction
-            double unitX = dx / distance;
-            double unitY = dy / distance;
+            Vector2D delta = GetDeltaDistances(static_cast<int>(i), static_cast<int>(j));
 
             // Get the charge of each particle
             double q1 = particles[i].GetCharge();
             double q2 = particles[j].GetCharge();
 
-            // Apply coulomb's force
-            double coulombLaw = -k * q1 * q2 / distanceSquared;
+            Vector2D forceSI = ComputeCoulombForceSI(
+                delta,
+                coulombConstant,
+                q1,
+                q2,
+                minDistanceClamp,
+                metersPerPixel,
+                coulombsPerChargeUnit);
 
-            // Get the direction of the force
-            double fx = coulombLaw * unitX;
-            double fy = coulombLaw * unitY;
+            Vector2D forceSimulation = forceSI * newtonsToSimulationForce;
 
             // Apply the force
-            particles[i].ApplyForce(fx, fy, dt);
-            particles[j].ApplyForce(-fx, -fy, dt);
+            particles[i].ApplyForce(forceSimulation.GetX(), forceSimulation.GetY(), dt);
+            particles[j].ApplyForce(-forceSimulation.GetX(), -forceSimulation.GetY(), dt);
         }
     }
 }
@@ -460,4 +493,198 @@ bool Simulation::HasSelectedParticle() const {
 
 int Simulation::GetSelectedParticleIndex() const {
     return selectedParticleIndex;
+}
+
+// Force Analysis
+Vector2D Simulation::GetForceBetweenParticles(int particle1, int particle2) const {
+    // if particle 1 or particle 2 is less then 0, then return vector between
+    // them as zero
+    if (particle1 < 0 || particle2 < 0) {
+        return Vector2D(0.0, 0.0);
+    }
+
+    // if either particle has an index greater than the particles vector, then return 0
+    if (particle1 >= static_cast<int>(particles.size()) || 
+        particle2 >= static_cast<int>(particles.size())) {
+        return Vector2D(0.0, 0.0);
+    }
+
+    // If both particles have the same index, vector return 0
+    if (particle1 == particle2) {
+        return Vector2D(0.0, 0.0);
+    }
+
+    // calculate the delta between the two particles
+    Vector2D delta = GetDeltaDistances(particle1, particle2);
+    // Get the charge 
+    double q1 = particles[particle1].GetCharge();
+    double q2 = particles[particle2].GetCharge();
+
+    Vector2D forceSI = ComputeCoulombForceSI(
+        delta,
+        coulombConstant,
+        q1,
+        q2,
+        minDistanceClamp,
+        metersPerPixel,
+        coulombsPerChargeUnit);
+
+    double newtonsToSimulationForce = 1.0 / (kilogramsPerMassUnit * metersPerPixel);
+    return forceSI * newtonsToSimulationForce;
+}
+
+Vector2D Simulation::GetTotalForceOnParticle(int particleIndex) const {
+
+    // Instances where particle index is less than 0 or is greater than particles size
+    if (particleIndex < 0 || particleIndex >= static_cast<int>(particles.size())) {
+        return Vector2D(0.0, 0.0);
+    }
+
+    Vector2D totalForce(0.0, 0.0);
+
+    for (int i = 0; i < static_cast<int>(particles.size()); i++) {
+        if (i != particleIndex) {
+            totalForce += GetForceBetweenParticles(particleIndex, i);
+        }
+    }
+
+    return totalForce;
+}
+
+Vector2D Simulation::GetTotalForceOnParticleSI(int particleIndex) const {
+    if (particleIndex < 0 || particleIndex >= static_cast<int>(particles.size())) {
+        return Vector2D(0.0, 0.0);
+    }
+
+    Vector2D totalForceSI(0.0, 0.0);
+
+    for (int i = 0; i < static_cast<int>(particles.size()); i++) {
+        if (i != particleIndex) {
+            Vector2D delta = GetDeltaDistances(particleIndex, i);
+            double q1 = particles[particleIndex].GetCharge();
+            double q2 = particles[i].GetCharge();
+
+            totalForceSI += ComputeCoulombForceSI(
+                delta,
+                coulombConstant,
+                q1,
+                q2,
+                minDistanceClamp,
+                metersPerPixel,
+                coulombsPerChargeUnit);
+        }
+    }
+
+    return totalForceSI;
+}
+
+// Draw the force arrow
+void Simulation::DrawForceArrow(sf::RenderWindow& window, const Vector2D& startPosition, const Vector2D& force, sf::Color color, double referenceMagnitude) const {
+
+    // Get the magnitude of the force
+    double forceMagnitude = force.Magnitude();
+
+    // if force is less than 0 (not possible)
+    if (forceMagnitude <= 0.0) {
+        return;
+    }
+
+    Vector2D direction = force.Normalized();
+
+    if (referenceMagnitude <= 0.0) {
+        return;
+    }
+
+    // Scale arrow lengths relative to the strongest displayed force.
+    const double minArrowLength = 8.0;
+    const double maxArrowLength = 120.0;
+    double normalizedMagnitude = std::clamp(forceMagnitude / referenceMagnitude, 0.0, 1.0);
+    double perceptualScale = std::sqrt(normalizedMagnitude);
+    double arrowLength = minArrowLength + (maxArrowLength - minArrowLength) * perceptualScale;
+
+    double headLength = std::clamp(arrowLength * 0.18, 6.0, 14.0);
+    double headHalfWidth = headLength * 0.6;
+
+    Vector2D arrowVector = direction * arrowLength;
+    Vector2D endPosition = startPosition + arrowVector;
+
+    // Get radians, then turn to degrees
+    double angleRadians = std::atan2(arrowVector.GetY(), arrowVector.GetX());
+    double angleDegrees = angleRadians * 180 / 3.14159265358979323846;
+
+    // Build the arrow
+    sf::RectangleShape shaft;
+    shaft.setSize({static_cast<float>(arrowLength), 3.0f});
+    shaft.setPosition({
+        static_cast<float>(startPosition.GetX()),
+        static_cast<float>(startPosition.GetY())
+    });
+    shaft.setRotation(sf::degrees(static_cast<float>(angleDegrees)));
+    shaft.setFillColor(color);
+
+    sf::ConvexShape arrowHead;
+    arrowHead.setPointCount(3);
+    arrowHead.setPoint(0, { 0.0f, 0.0f });
+    arrowHead.setPoint(1, { static_cast<float>(-headLength), static_cast<float>(-headHalfWidth) });
+    arrowHead.setPoint(2, { static_cast<float>(-headLength), static_cast<float>(headHalfWidth) });
+    arrowHead.setPosition({
+        static_cast<float>(endPosition.GetX()),
+        static_cast<float>(endPosition.GetY())
+    });
+    arrowHead.setRotation(sf::degrees(static_cast<float>(angleDegrees)));
+    arrowHead.setFillColor(color);
+
+    window.draw(shaft);
+    window.draw(arrowHead);
+}
+
+// Implement drawing force vectors
+void Simulation::DrawForces(sf::RenderWindow& window) const {
+    if (!HasSelectedParticle()) {
+        return;
+    }
+
+
+    if (selectedParticleIndex < 0 || selectedParticleIndex >= static_cast<int>(particles.size())) {
+        return;
+    }
+
+    const Particle& selectedParticle = particles[selectedParticleIndex];
+
+    Vector2D selectedPosition(
+        selectedParticle.GetXPos(),
+        selectedParticle.GetYPos()
+    );
+
+    std::vector<Vector2D> forcesToDraw;
+    std::vector<sf::Color> colorsToDraw;
+    forcesToDraw.reserve(particles.size());
+    colorsToDraw.reserve(particles.size());
+
+    double maxMagnitude = 0.0;
+
+    for (int i = 0; i < static_cast<int>(particles.size()); ++i) {
+        if (i == selectedParticleIndex) {
+            continue;
+        }
+
+        Vector2D force = GetForceBetweenParticles(selectedParticleIndex, i);
+        maxMagnitude = std::max(maxMagnitude, force.Magnitude());
+        forcesToDraw.push_back(force);
+        colorsToDraw.push_back(sf::Color::Yellow);
+    }
+
+    Vector2D totalForce = GetTotalForceOnParticle(selectedParticleIndex);
+    maxMagnitude = std::max(maxMagnitude, totalForce.Magnitude());
+
+    if (maxMagnitude <= 0.0) {
+        return;
+    }
+
+    for (size_t i = 0; i < forcesToDraw.size(); ++i) {
+        DrawForceArrow(window, selectedPosition, forcesToDraw[i], colorsToDraw[i], maxMagnitude);
+    }
+
+    DrawForceArrow(window, selectedPosition, totalForce, sf::Color::White, maxMagnitude);
+
 }

@@ -42,6 +42,16 @@ class Simulation {
         void ClearSelectedParticle();
         bool HasSelectedParticle() const;
         int GetSelectedParticleIndex() const;
+
+        // Force analysis
+        Vector2D GetForceBetweenParticles(int particle1, int particle2) const;
+        Vector2D GetTotalForceOnParticle(int particleIndex) const;
+        Vector2D GetTotalForceOnParticleSI(int particleIndex) const;
+
+        // Draw particle forces
+        void DrawForces(sf::RenderWindow& window) const;
+        void DrawForceArrow(sf::RenderWindow& window, const Vector2D& startPosition, const Vector2D& force, sf::Color color, double referenceMagnitude) const;
+        
         
         
     private:
@@ -66,9 +76,12 @@ class Simulation {
 
         // vector list of particles
         std::vector<Particle> particles;
-        double charge = 1.6e-19;
-        double coulombConstant = 8.9875517923e9;
-        double dummyCoulomb = 500000.0;
+        double coulombConstant;
+
+        // Unit scales convert simulation quantities to SI for physically meaningful values.
+        double metersPerPixel;
+        double coulombsPerChargeUnit;
+        double kilogramsPerMassUnit;
 
         // Prevent huge forces at tiny distances.
         double minDistanceClamp;

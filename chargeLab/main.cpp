@@ -5,6 +5,7 @@
 #include <vector>
 #include <random>
 #include <string>
+#include <iomanip>
 
 // Temporary random particle generator
 Particle CreateRandomParticle(int particleNumber, double worldWidth, double worldHeight)
@@ -189,15 +190,32 @@ int main()
                 if (mousePressed->button == sf::Mouse::Button::Left) {
                     // Make sure the mouse is within the SFML window
                     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
-                    
-                        // If the mouse is in the simulation window AND user clicked within the particle
+
+                    // If the mouse is in the simulation window AND user clicked within the particle
                     if (simulation.SelectedParticleAt(mousePosition.x, mousePosition.y)) {
+                        int selectedIndex = simulation.GetSelectedParticleIndex();
+                        Vector2D totalForce = simulation.GetTotalForceOnParticle(
+                            selectedIndex);
+                        Vector2D totalForceSI = simulation.GetTotalForceOnParticleSI(
+                            selectedIndex);
+
                         std::cout << "Selected particle index: "
-                                << simulation.GetSelectedParticleIndex()
+                                << selectedIndex
                                 << std::endl;
+
+                        std::cout << "Total force (simulation units): ";
+                        totalForce.Print();
+
+                        std::cout << std::scientific << std::setprecision(6);
+                        std::cout << "Total force (SI, N): ("
+                                  << totalForceSI.GetX() << ", "
+                                  << totalForceSI.GetY() << ")"
+                                  << std::endl;
+                        std::cout << std::defaultfloat;
                     }
 
                     else {
+                        simulation.ClearSelectedParticle();
                         std::cout << "No particle selected." << std::endl;
                     }
                 }
