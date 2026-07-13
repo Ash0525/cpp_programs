@@ -17,7 +17,6 @@ class Simulation {
 
         // ESSENTIAL SIMULATION FUNCTIONS
         void Update(double dt);
-        void Draw(sf::RenderWindow& window) const;
         void PrintParticles() const;
 
         // Add pause toggle for window
@@ -48,10 +47,6 @@ class Simulation {
         Vector2D GetTotalForceOnParticle(int particleIndex) const;
         Vector2D GetTotalForceOnParticleSI(int particleIndex) const;
 
-        // Draw particle forces
-        void DrawForces(sf::RenderWindow& window) const;
-        void DrawForceArrow(sf::RenderWindow& window, const Vector2D& startPosition, const Vector2D& force, sf::Color color, double referenceMagnitude) const;
-        
         // Moving particles with mouse
         void MoveSelected(double x, double y);
         void SetSelectedVelocity(double vx, double vy);
