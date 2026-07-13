@@ -58,6 +58,7 @@ int main()
     sf::Vector2f dragStartWorld(0.0f, 0.0f);
     sf::Vector2f dragGrabOffset(0.0f, 0.0f);
     const float dragStartThreshold = 8.0f;
+    double printTimer = 0.0;
 
     // Start clock
     sf::Clock clock;
@@ -270,6 +271,22 @@ int main()
 
         // Update the simulation
         simulation.Update(dt);
+
+        if (!simulation.IsPaused()) {
+            printTimer += dt;
+
+            if (printTimer >= 1.0) {
+                std::cout << "Elapsed time: "
+                        << simulation.GetElapsedTime()
+                        << " seconds"
+                        << std::endl;
+
+                printTimer = 0.0;
+            }
+        }
+        else {
+            printTimer = 0.0;
+        }
 
         window.clear(sf::Color::Black);
         renderer.Draw(window, simulation);

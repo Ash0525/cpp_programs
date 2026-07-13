@@ -67,6 +67,10 @@ class Simulation {
         double GetParticleY(int index) const;
         double GetParticleRadius(int index) const;
         double GetParticleCharge(int index) const;
+
+        // Time tracking functions
+        double GetElapsedTime() const;
+        void ResetElapsedTime();
         
     private:
         // private functions
@@ -102,4 +106,6 @@ class Simulation {
         double height;
         bool paused;
         int maxParticles;
+
+        double elapsedTime;
 };

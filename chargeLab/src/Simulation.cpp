@@ -8,40 +8,45 @@
 #include <iostream>
 
 // ===== File-local helpers =====
-namespace {
+namespace
+{
 
-double CoulombsLaw(double k, double q1, double q2, double r) {
-    return (-k * q1 * q2) / (r * r);
-}
-
-Vector2D ComputeCoulombForceSI(
-    const Vector2D& delta,
-    double k,
-    double q1,
-    double q2,
-    double minDistanceClamp,
-    double metersPerPixel,
-    double coulombsPerChargeUnit) {
-    Vector2D deltaMeters = delta * metersPerPixel;
-    double distanceSquared = deltaMeters.MagnitudeSquared();
-    double minDistanceMeters = minDistanceClamp * metersPerPixel;
-    double minDistanceSquared = minDistanceMeters * minDistanceMeters;
-
-    if (distanceSquared < minDistanceSquared) {
-        distanceSquared = minDistanceSquared;
+    double CoulombsLaw(double k, double q1, double q2, double r)
+    {
+        return (-k * q1 * q2) / (r * r);
     }
 
-    double distance = std::sqrt(distanceSquared);
-    if (distance == 0.0) {
-        return Vector2D(0.0, 0.0);
-    }
+    Vector2D ComputeCoulombForceSI(
+        const Vector2D &delta,
+        double k,
+        double q1,
+        double q2,
+        double minDistanceClamp,
+        double metersPerPixel,
+        double coulombsPerChargeUnit)
+    {
+        Vector2D deltaMeters = delta * metersPerPixel;
+        double distanceSquared = deltaMeters.MagnitudeSquared();
+        double minDistanceMeters = minDistanceClamp * metersPerPixel;
+        double minDistanceSquared = minDistanceMeters * minDistanceMeters;
 
-    Vector2D direction = deltaMeters / distance;
-    double q1SI = q1 * coulombsPerChargeUnit;
-    double q2SI = q2 * coulombsPerChargeUnit;
-    double forceMagnitude = CoulombsLaw(k, q1SI, q2SI, distance);
-    return direction * forceMagnitude;
-}
+        if (distanceSquared < minDistanceSquared)
+        {
+            distanceSquared = minDistanceSquared;
+        }
+
+        double distance = std::sqrt(distanceSquared);
+        if (distance == 0.0)
+        {
+            return Vector2D(0.0, 0.0);
+        }
+
+        Vector2D direction = deltaMeters / distance;
+        double q1SI = q1 * coulombsPerChargeUnit;
+        double q2SI = q2 * coulombsPerChargeUnit;
+        double forceMagnitude = CoulombsLaw(k, q1SI, q2SI, distance);
+        return direction * forceMagnitude;
+    }
 
 }
 
@@ -67,6 +72,8 @@ Simulation::Simulation()
     // Selected Particle status
     selectedParticleIndex = -1;
 
+    // Elapsed time
+    elapsedTime = 0.0;
 };
 
 // Custom size for simulation
@@ -90,6 +97,8 @@ Simulation::Simulation(double width, double height)
     // Selected Particle status
     selectedParticleIndex = -1;
 
+    // Elapsed time
+    elapsedTime = 0.0;
 }
 
 void Simulation::TogglePaused()
@@ -133,6 +142,9 @@ void Simulation::Update(double dt)
     {
         return;
     }
+
+    // Update elapsed time
+    elapsedTime += dt;
 
     // Initialize the force
     ApplyCoulombForces(dt);
@@ -409,19 +421,20 @@ bool Simulation::AddParticleAt(double x, double y, double charge, double mass, d
 // ===== Selection =====
 
 // Define select particle at
-bool Simulation::SelectedParticleAt(double x, double y) {
+bool Simulation::SelectedParticleAt(double x, double y)
+{
     selectedParticleIndex = -1;
 
     // Initialize a vector object
     Vector2D clickPosition(x, y);
 
-    for (int i = static_cast<int>(particles.size()) - 1; i >= 0; i--) {
+    for (int i = static_cast<int>(particles.size()) - 1; i >= 0; i--)
+    {
 
         // Note where the particle is
         Vector2D particlePosition(
             particles[i].GetXPos(),
-            particles[i].GetYPos()
-        );
+            particles[i].GetYPos());
 
         Vector2D delta = clickPosition - particlePosition;
 
@@ -430,7 +443,8 @@ bool Simulation::SelectedParticleAt(double x, double y) {
         double distanceSquared = delta.MagnitudeSquared();
         double radius = particles[i].GetRadius();
 
-        if (distanceSquared <= radius * radius) {
+        if (distanceSquared <= radius * radius)
+        {
 
             // You've selected the i'th particle
             selectedParticleIndex = i;
@@ -442,43 +456,50 @@ bool Simulation::SelectedParticleAt(double x, double y) {
     return false;
 }
 
-void Simulation::ClearSelectedParticle() {
+void Simulation::ClearSelectedParticle()
+{
     selectedParticleIndex = -1;
 }
 
-bool Simulation::HasSelectedParticle() const {
+bool Simulation::HasSelectedParticle() const
+{
 
     return selectedParticleIndex != -1;
 }
 
-int Simulation::GetSelectedParticleIndex() const {
+int Simulation::GetSelectedParticleIndex() const
+{
     return selectedParticleIndex;
 }
 
 // ===== Force analysis =====
 
 // Force Analysis
-Vector2D Simulation::GetForceBetweenParticles(int particle1, int particle2) const {
+Vector2D Simulation::GetForceBetweenParticles(int particle1, int particle2) const
+{
     // if particle 1 or particle 2 is less then 0, then return vector between
     // them as zero
-    if (particle1 < 0 || particle2 < 0) {
+    if (particle1 < 0 || particle2 < 0)
+    {
         return Vector2D(0.0, 0.0);
     }
 
     // if either particle has an index greater than the particles vector, then return 0
-    if (particle1 >= static_cast<int>(particles.size()) || 
-        particle2 >= static_cast<int>(particles.size())) {
+    if (particle1 >= static_cast<int>(particles.size()) ||
+        particle2 >= static_cast<int>(particles.size()))
+    {
         return Vector2D(0.0, 0.0);
     }
 
     // If both particles have the same index, vector return 0
-    if (particle1 == particle2) {
+    if (particle1 == particle2)
+    {
         return Vector2D(0.0, 0.0);
     }
 
     // calculate the delta between the two particles
     Vector2D delta = GetDeltaDistances(particle1, particle2);
-    // Get the charge 
+    // Get the charge
     double q1 = particles[particle1].GetCharge();
     double q2 = particles[particle2].GetCharge();
 
@@ -495,17 +516,21 @@ Vector2D Simulation::GetForceBetweenParticles(int particle1, int particle2) cons
     return forceSI * newtonsToSimulationForce;
 }
 
-Vector2D Simulation::GetTotalForceOnParticle(int particleIndex) const {
+Vector2D Simulation::GetTotalForceOnParticle(int particleIndex) const
+{
 
     // Instances where particle index is less than 0 or is greater than particles size
-    if (particleIndex < 0 || particleIndex >= static_cast<int>(particles.size())) {
+    if (particleIndex < 0 || particleIndex >= static_cast<int>(particles.size()))
+    {
         return Vector2D(0.0, 0.0);
     }
 
     Vector2D totalForce(0.0, 0.0);
 
-    for (int i = 0; i < static_cast<int>(particles.size()); i++) {
-        if (i != particleIndex) {
+    for (int i = 0; i < static_cast<int>(particles.size()); i++)
+    {
+        if (i != particleIndex)
+        {
             totalForce += GetForceBetweenParticles(particleIndex, i);
         }
     }
@@ -513,15 +538,19 @@ Vector2D Simulation::GetTotalForceOnParticle(int particleIndex) const {
     return totalForce;
 }
 
-Vector2D Simulation::GetTotalForceOnParticleSI(int particleIndex) const {
-    if (particleIndex < 0 || particleIndex >= static_cast<int>(particles.size())) {
+Vector2D Simulation::GetTotalForceOnParticleSI(int particleIndex) const
+{
+    if (particleIndex < 0 || particleIndex >= static_cast<int>(particles.size()))
+    {
         return Vector2D(0.0, 0.0);
     }
 
     Vector2D totalForceSI(0.0, 0.0);
 
-    for (int i = 0; i < static_cast<int>(particles.size()); i++) {
-        if (i != particleIndex) {
+    for (int i = 0; i < static_cast<int>(particles.size()); i++)
+    {
+        if (i != particleIndex)
+        {
             Vector2D delta = GetDeltaDistances(particleIndex, i);
             double q1 = particles[particleIndex].GetCharge();
             double q2 = particles[i].GetCharge();
@@ -542,40 +571,50 @@ Vector2D Simulation::GetTotalForceOnParticleSI(int particleIndex) const {
 
 // ===== Selected particle mutators =====
 
-void Simulation::MoveSelected(double x, double y) {
-    if (!HasSelectedParticle()) {
+void Simulation::MoveSelected(double x, double y)
+{
+    if (!HasSelectedParticle())
+    {
         return;
     }
 
     particles[selectedParticleIndex].SetPosition(x, y);
 }
 
-void Simulation::SetSelectedVelocity(double vx, double vy) {
-    if (!HasSelectedParticle()) {
+void Simulation::SetSelectedVelocity(double vx, double vy)
+{
+    if (!HasSelectedParticle())
+    {
         return;
     }
 
     particles[selectedParticleIndex].SetVelocity(vx, vy);
 }
 
-void Simulation::SetSelectedCharge(double charge) {
-    if (!HasSelectedParticle()) {
+void Simulation::SetSelectedCharge(double charge)
+{
+    if (!HasSelectedParticle())
+    {
         return;
     }
 
     particles[selectedParticleIndex].SetCharge(charge);
 }
 
-void Simulation::SetSelectedMass(double mass) {
-    if (!HasSelectedParticle()) {
+void Simulation::SetSelectedMass(double mass)
+{
+    if (!HasSelectedParticle())
+    {
         return;
     }
 
     particles[selectedParticleIndex].SetMass(mass);
 }
 
-void Simulation::SetSelectedRadius(double radius) {
-    if (!HasSelectedParticle()) {
+void Simulation::SetSelectedRadius(double radius)
+{
+    if (!HasSelectedParticle())
+    {
         return;
     }
 
@@ -584,90 +623,123 @@ void Simulation::SetSelectedRadius(double radius) {
 
 // ===== Selected particle accessors =====
 
-double Simulation::GetSelectedCharge() const {
-    if (!HasSelectedParticle()) {
+double Simulation::GetSelectedCharge() const
+{
+    if (!HasSelectedParticle())
+    {
         return 0.0;
     }
 
     return particles[selectedParticleIndex].GetCharge();
 }
 
-double Simulation::GetSelectedMass() const {
-    if (!HasSelectedParticle()) {
+double Simulation::GetSelectedMass() const
+{
+    if (!HasSelectedParticle())
+    {
         return 0.0;
     }
 
     return particles[selectedParticleIndex].GetMass();
 }
 
-double Simulation::GetSelectedRadius() const {
-    if (!HasSelectedParticle()) {
+double Simulation::GetSelectedRadius() const
+{
+    if (!HasSelectedParticle())
+    {
         return 0.0;
     }
 
     return particles[selectedParticleIndex].GetRadius();
 }
 
-double Simulation::GetSelectedX() const {
-    if (!HasSelectedParticle()) {
+double Simulation::GetSelectedX() const
+{
+    if (!HasSelectedParticle())
+    {
         return 0.0;
     }
 
     return particles[selectedParticleIndex].GetXPos();
 }
 
-double Simulation::GetSelectedY() const {
-    if (!HasSelectedParticle()) {
+double Simulation::GetSelectedY() const
+{
+    if (!HasSelectedParticle())
+    {
         return 0.0;
     }
 
     return particles[selectedParticleIndex].GetYPos();
 }
 
-double Simulation::GetSelectedVx() const {
-    if (!HasSelectedParticle()) {
+double Simulation::GetSelectedVx() const
+{
+    if (!HasSelectedParticle())
+    {
         return 0.0;
     }
 
     return particles[selectedParticleIndex].GetVX();
 }
 
-double Simulation::GetSelectedVy() const {
-    if (!HasSelectedParticle()) {
+double Simulation::GetSelectedVy() const
+{
+    if (!HasSelectedParticle())
+    {
         return 0.0;
     }
 
     return particles[selectedParticleIndex].GetVY();
 }
 
-double Simulation::GetParticleX(int index) const {
-    if (index < 0 || index >= static_cast<int>(particles.size())) {
+double Simulation::GetParticleX(int index) const
+{
+    if (index < 0 || index >= static_cast<int>(particles.size()))
+    {
         return 0.0;
     }
 
     return particles[index].GetXPos();
 }
 
-double Simulation::GetParticleY(int index) const {
-    if (index < 0 || index >= static_cast<int>(particles.size())) {
+double Simulation::GetParticleY(int index) const
+{
+    if (index < 0 || index >= static_cast<int>(particles.size()))
+    {
         return 0.0;
     }
 
     return particles[index].GetYPos();
 }
 
-double Simulation::GetParticleRadius(int index) const {
-    if (index < 0 || index >= static_cast<int>(particles.size())) {
+double Simulation::GetParticleRadius(int index) const
+{
+    if (index < 0 || index >= static_cast<int>(particles.size()))
+    {
         return 0.0;
     }
 
     return particles[index].GetRadius();
 }
 
-double Simulation::GetParticleCharge(int index) const {
-    if (index < 0 || index >= static_cast<int>(particles.size())) {
+double Simulation::GetParticleCharge(int index) const
+{
+    if (index < 0 || index >= static_cast<int>(particles.size()))
+    {
         return 0.0;
     }
 
     return particles[index].GetCharge();
+}
+
+// Tracking time
+double Simulation::GetElapsedTime() const
+{
+    return elapsedTime;
+}
+
+void Simulation::ResetElapsedTime()
+{
+    elapsedTime = 0.0;
 }
