@@ -58,6 +58,7 @@ int main()
     sf::Vector2f dragStartWorld(0.0f, 0.0f);
     sf::Vector2f dragGrabOffset(0.0f, 0.0f);
     const float dragStartThreshold = 8.0f;
+    bool showEnergyDebug = false;
     double printTimer = 0.0;
 
     // Start clock
@@ -99,7 +100,27 @@ int main()
     // Debug print the max particles allowed in simulation
     std::cout << "Number of particles in simulation: ";
     std::cout << simulation.GetParticleCount() << "/" << simulation.GetMaxParticles() << std::endl;
+    simulation.SetME0();
 
+    auto PrintEnergyDebug = [&simulation]() {
+        double ke = simulation.GetKE();
+        double pe = simulation.GetPE();
+        double me = simulation.GetME();
+        double me0 = simulation.GetME0();
+        double drift = simulation.GetMEDrift();
+        double driftPct = simulation.GetMEDriftPct();
+
+        std::cout << std::scientific << std::setprecision(6)
+                  << "Energy Debug | KE=" << ke
+                  << " J, PE=" << pe
+                  << " J, ME=" << me
+                  << " J, ME0=" << me0
+                  << " J, Drift=" << drift
+                  << " J (" << driftPct << "%)"
+                  << std::endl
+                  << std::defaultfloat;
+    };
+    
     // Main loop
     while (window.isOpen())
     {
@@ -119,6 +140,23 @@ int main()
                 if (keyPressed->code == sf::Keyboard::Key::Space)
                 {
                     simulation.TogglePaused();
+                }
+
+                // E: toggle energy debug print
+                if (keyPressed->code == sf::Keyboard::Key::E)
+                {
+                    showEnergyDebug = !showEnergyDebug;
+
+                    if (showEnergyDebug)
+                    {
+                        simulation.SetME0();
+                        printTimer = 1.0;
+                        std::cout << "Energy debug: ON" << std::endl;
+                    }
+                    else
+                    {
+                        std::cout << "Energy debug: OFF" << std::endl;
+                    }
                 }
 
                 // C: clear the particles
@@ -272,7 +310,7 @@ int main()
         // Update the simulation
         simulation.Update(dt);
 
-        if (!simulation.IsPaused()) {
+        if (!simulation.IsPaused() && showEnergyDebug) {
             printTimer += dt;
 
             if (printTimer >= 1.0) {
@@ -280,6 +318,8 @@ int main()
                         << simulation.GetElapsedTime()
                         << " seconds"
                         << std::endl;
+
+                PrintEnergyDebug();
 
                 printTimer = 0.0;
             }

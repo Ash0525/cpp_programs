@@ -71,6 +71,16 @@ class Simulation {
         // Time tracking functions
         double GetElapsedTime() const;
         void ResetElapsedTime();
+
+        // Energy tracking
+        double GetKE() const;
+        double GetPE() const;
+        double GetME() const;
+        void SetME0();
+        double GetME0() const;
+        double GetMEDrift() const;
+        double GetMEDriftPct() const;
+        bool IsMEStable(double tolerancePct) const;
         
     private:
         // private functions
@@ -108,4 +118,6 @@ class Simulation {
         int maxParticles;
 
         double elapsedTime;
+        double initialME;
+        
 };

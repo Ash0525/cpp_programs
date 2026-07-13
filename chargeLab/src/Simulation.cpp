@@ -74,6 +74,9 @@ Simulation::Simulation()
 
     // Elapsed time
     elapsedTime = 0.0;
+
+    // Initial ME
+    initialME = 0.0;
 };
 
 // Custom size for simulation
@@ -99,6 +102,9 @@ Simulation::Simulation(double width, double height)
 
     // Elapsed time
     elapsedTime = 0.0;
+
+    // Initial ME
+    initialME = 0.0;
 }
 
 void Simulation::TogglePaused()
@@ -393,6 +399,9 @@ void Simulation::ClearParticles()
 
     // remove the particles
     particles.clear();
+    ClearSelectedParticle();
+    elapsedTime = 0.0;
+    initialME = 0.0;
 }
 
 bool Simulation::AddParticleAt(double x, double y, double charge)
@@ -742,4 +751,82 @@ double Simulation::GetElapsedTime() const
 void Simulation::ResetElapsedTime()
 {
     elapsedTime = 0.0;
+}
+
+// Tracking Energy functions
+double Simulation::GetKE() const {
+    double totalKE = 0.0;
+
+    // For each particle, we need to get it's speed and mass
+    for (size_t i = 0; i < static_cast<int>(particles.size()); i++) {
+
+        // Get the mass of each particle
+        double mass = particles[i].GetMass();
+
+        // Get the velocity
+        double vx = particles[i].GetVX();
+        double vy = particles[i].GetVY();
+
+        // Calculated velocity squared. Consider that we don't need the square root from magnitude
+        double speedSquared = (vx * vx) + (vy * vy);
+
+        // Return the total Kinetic energy
+        totalKE += 0.5 * mass * speedSquared;
+    }
+
+    return totalKE;
+}
+
+double Simulation::GetPE() const {
+    double totalPE = 0.0;
+
+    // Sum pairwise electric potential energy in SI units: U = k*q1*q2/r.
+    for (size_t i = 0; i < particles.size(); i++) {
+        for (size_t j = i + 1; j < particles.size(); j++) {
+
+            Vector2D delta = GetDeltaDistances(static_cast<int>(i), static_cast<int>(j));
+
+            double distanceMeters = delta.Magnitude() * metersPerPixel;
+            double minDistanceMeters = minDistanceClamp * metersPerPixel;
+            if (distanceMeters < minDistanceMeters) {
+                distanceMeters = minDistanceMeters;
+            }
+
+            double q1SI = particles[i].GetCharge() * coulombsPerChargeUnit;
+            double q2SI = particles[j].GetCharge() * coulombsPerChargeUnit;
+
+            totalPE += (coulombConstant * q1SI * q2SI) / distanceMeters;
+
+        }
+    }
+
+    return totalPE;
+}
+
+double Simulation::GetME() const {
+    return GetKE() + GetPE();
+}
+
+void Simulation::SetME0() {
+    initialME = GetME();
+}
+
+double Simulation::GetME0() const {
+    return initialME;
+}
+
+double Simulation::GetMEDrift() const {
+    return GetME() - initialME;
+}
+
+double Simulation::GetMEDriftPct() const {
+    if (initialME == 0.0) {
+        return 0.0;
+    }
+
+    return (GetMEDrift() / initialME) * 100.0;
+}
+
+bool Simulation::IsMEStable(double tolerancePct) const {
+    return std::abs(GetMEDriftPct()) <= tolerancePct;
 }
