@@ -41,3 +41,17 @@ void SFMLRenderer::Draw(sf::RenderWindow& window, const Simulation& simulation) 
         window.draw(circle);
     }
 }
+
+void SFMLRenderer::DrawForces(sf::RenderWindow&, const Simulation& simulation) const {
+
+}
+
+void SFMLRenderer::DrawForceArrow(
+            sf::RenderWindow& window,
+            const Vector2D& startPosition,
+            const Vector2D& force,
+            double maxForceMagnitude,
+            sf::Color color
+        ) const {
+
+}
