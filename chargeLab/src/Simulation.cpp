@@ -1,5 +1,4 @@
 #include <vector>
-#include <SFML/Graphics.hpp>
 #include <cmath>
 #include "Particle.h"
 #include "Simulation.h"
