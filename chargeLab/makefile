@@ -34,7 +34,8 @@ RUNTIME_DLLS := \
 SRCS := main.cpp \
 	src/Vector2D.cpp \
 	src/Particle.cpp \
-	src/Simulation.cpp
+	src/Simulation.cpp \
+	src/SFMLRenderer.cpp
 
 # Object files
 OBJS := $(SRCS:.cpp=.o)

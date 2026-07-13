@@ -806,3 +806,35 @@ double Simulation::GetSelectedVy() const {
 
     return particles[selectedParticleIndex].GetVY();
 }
+
+double Simulation::GetParticleX(int index) const {
+    if (index < 0 || index >= static_cast<int>(particles.size())) {
+        return 0.0;
+    }
+
+    return particles[index].GetXPos();
+}
+
+double Simulation::GetParticleY(int index) const {
+    if (index < 0 || index >= static_cast<int>(particles.size())) {
+        return 0.0;
+    }
+
+    return particles[index].GetYPos();
+}
+
+double Simulation::GetParticleRadius(int index) const {
+    if (index < 0 || index >= static_cast<int>(particles.size())) {
+        return 0.0;
+    }
+
+    return particles[index].GetRadius();
+}
+
+double Simulation::GetParticleCharge(int index) const {
+    if (index < 0 || index >= static_cast<int>(particles.size())) {
+        return 0.0;
+    }
+
+    return particles[index].GetCharge();
+}
