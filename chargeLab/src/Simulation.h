@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <SFML/Graphics.hpp>
 #include "Particle.h"
 #include "Vector2D.h"
 
