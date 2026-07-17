@@ -4,34 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChargeLab Web Test</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>ChargeLab WebAssembly Test</h1>
-    <p>Open the browser console to see if the C++ Simulation loaded</p>
+    <main>
+        <h1>ChargeLab Web</h1>
 
-    <script>
-        var Module = {
-            onRuntimeInitialized: function () {
-                console.log("ChargeLab WASM loaded!");
+        <canvas id="simCanvas" width="900" height="700"></canvas>
+    </main>
 
-                const simulation = new Module.Simulation(900, 700);
-
-                console.log("Initialz particle count: ", simulation.getParticleCount());
-
-                simulation.addParticleAt(300, 350, 1.0);
-                simulation.addParticleAt(600, 350, -1.0);
-
-                // Testing certain methods
-                console.log("Particle count after adding: ", simulation.getParticleCount());
-                console.log("Particle 0 at x: ", simulation.getParticleX(0));
-                console.log("Particle 0 at y: ", simulation.getParticleY(0));
-                console.log("Particle 0 charge: ", simulation.getParticleCharge(0));
-
-                window.simulation = simulation;
-            }
-        }
-    </script>
-
+    <script src="app.js"></script>
     <script src="chargeLab.js"></script>
     
 </body>
