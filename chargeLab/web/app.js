@@ -82,22 +82,31 @@ function animationLoop(currentTime) {
     if (simulation !== null && !physicsCrashed) {
         try {
             if (Number.isFinite(dt) && dt >= 0) {
+                if (isDraggingSelected && simulation.hasSelected()) {
+                    simulation.moveSelected(mouseX, mouseY);
+                    simulation.setSelectedVelocity(0.0, 0.0);
+                }
+
                 stepSimulationSafely(dt);
+
+                if (isDraggingSelected && simulation.hasSelected()) {
+                    simulation.moveSelected(mouseX, mouseY);
+                    simulation.setSelectedVelocity(0.0, 0.0);
+                }
             }
+
             drawParticles();
-        }
-        catch (error) {
+        } catch (error) {
             physicsCrashed = true;
-            console.error("Simulation update failed", error);
+            console.error("Simulation failed somehow ya noob", error);
         }
     }
-
     requestAnimationFrame(animationLoop);
 }
 
 // Mouse helper functions
 
-function getMousePosition(even) {
+function getMousePosition(event) {
 
     // Identify where the canvas is and how big it is
     const rect = canvas.getBoundingClientRect();
@@ -156,6 +165,8 @@ var Module = {
         ctx = canvas.getContext("2d");
 
         simulation = new Module.Simulation(900, 700);
+
+        setupMouseControls();
 
         simulation.addParticleAtFull(300, 350, 1.0, 10.0, 18.0);
         simulation.addParticleAtFull(600, 350, -1.0, 10.0, 18.0);
