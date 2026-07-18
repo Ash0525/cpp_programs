@@ -5,6 +5,10 @@ let ctx = null;
 let lastTime = 0;
 let physicsCrashed = false;
 
+let isDraggingSelected = false;
+let mouseX = 0;
+let mouseY = 0;
+
 const MAX_FRAME_DT = 1.0 / 20.0;
 const MAX_SUBSTEP_DT = 1.0 / 240.0;
 
@@ -89,6 +93,59 @@ function animationLoop(currentTime) {
     }
 
     requestAnimationFrame(animationLoop);
+}
+
+// Mouse helper functions
+
+function getMousePosition(even) {
+
+    // Identify where the canvas is and how big it is
+    const rect = canvas.getBoundingClientRect();
+
+    // Visual resize for CSS
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    // Small state pieces that remember what the mouse is doing
+    mouseX = (event.clientX - rect.left) * scaleX;
+    mouseY = (event.clientY - rect.top) * scaleY;
+}
+
+function setupMouseControls() {
+    canvas.addEventListener("mousedown", (event) => {
+        getMousePosition(event);
+
+        // Boolean in selected if the mouse is at particle
+        const selected = simulation.selectParticleAt(mouseX, mouseY);
+
+        // If selected is true, then dragging is true
+        if (selected) {
+            isDraggingSelected = true;
+        }
+        else {
+            simulation.clearSelected();
+            isDraggingSelected = false;
+        }
+    });
+
+    canvas.addEventListener("mousemove", (event) => {
+        getMousePosition(event);
+
+        if (isDraggingSelected && simulation.hasSelected()) {
+            simulation.moveSelected(mouseX, mouseY);
+            simulation.setSelectedVelocity(0.0, 0.0);
+        }
+    });
+
+    // When the user releases the mouse button
+    canvas.addEventListener("mouseup", () => {
+        isDraggingSelected = false;
+    });
+
+    // When the mouse leaves the canvas area
+    canvas.addEventListener("mouseleave", () => {
+        isDraggingSelected = false;
+    });
 }
 
 var Module = {
