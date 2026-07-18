@@ -190,6 +190,65 @@ function drawArrow(startX, startY, endX, endY, color) {
     ctx.fill();
 }
 
+// Draw force vectors
+// Takes the drawArrow function and applies the C++ physics to it
+
+function drawForceVectors() {
+    if (!simulation.hasSelected()) {
+        return;
+    }
+
+    // Get the index of the selected particle
+    const selectedIndex = simulation.getSelectedIndex();
+
+    const startX = simulation.getParticleX(selectedIndex);
+    const startY = simulation.getParticleY(selectedIndex);
+
+    // Get the particle count
+    const particleCount = simulation.getParticleCount();
+
+    let forceData = [];
+    let maxForceMagnitude = 0;
+
+    for (let i = 0; i < particleCount; i++) {
+        if (i === selectedIndex) {
+            continue;
+        }
+
+        const force = simulation.getForceBetweenParticles(selectedIndex, i);
+
+        const fx = force.getX();
+        const fy = force.getY();
+        const magnitude = force.magnitude();
+
+        force.delete();
+
+        // Make sure there is a threshold for what is considered the max force so the arrow doesn't get too long
+        if (magnitude > maxForceMagnitude) {
+            maxForceMagnitude = magnitude;
+        }
+
+        forceData.push({ fx, fy, magnitude });
+    }
+
+    if (maxForceMagnitude === 0) {
+        return;
+    }
+
+    for (const force of forceData) {
+        // Normalize force vector
+        const unitX = force.fx / force.magnitude;
+        const unitY = force.fy / force.magnitude;
+
+        // Minimum arrow length is 20 px
+        const arrowLength = 20 + 100 * (force.magnitude / maxForceMagnitude);
+
+        const endX = startX + unitX * arrowLength;
+        const endY = startY + unitY * arrowLength;
+
+        drawArrow(startX, startY, endX, endY, "yellow");
+    }
+}
 var Module = {
     onRuntimeInitialized: function () {
         console.log("ChargeLab WASM loaded!");
