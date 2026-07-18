@@ -157,6 +157,39 @@ function setupMouseControls() {
     });
 }
 
+// Vector Drawing
+function drawArrow(startX, startY, endX, endY, color) {
+
+    const headLength = 12;
+    const angle = Math.atan2(endY - startY, endX - startX);
+
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 3;
+
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(endX, endY);
+    
+    // Draw the arrow heads
+    ctx.lineTo(
+        endX - headLength * Math.cos(angle - Math.PI / 6),
+        endY - headLength * Math.sin(angle - Math.PI / 6)
+    );
+
+    ctx.lineTo(
+        endX - headLength * Math.cos(angle + Math.PI / 6),
+        endY - headLength * Math.sin(angle + Math.PI / 6)
+    );
+
+    ctx.closePath();
+    ctx.fill();
+}
+
 var Module = {
     onRuntimeInitialized: function () {
         console.log("ChargeLab WASM loaded!");
