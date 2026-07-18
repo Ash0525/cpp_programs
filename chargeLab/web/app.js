@@ -29,6 +29,8 @@ function stepSimulationSafely(frameDt) {
 function drawParticles() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    drawForceVectors();
+
     const particleCount = simulation.getParticleCount();
 
     for (let i = 0; i < particleCount; i++) {
@@ -159,8 +161,15 @@ function setupMouseControls() {
 
 // Vector Drawing
 function drawArrow(startX, startY, endX, endY, color) {
+    const dx = endX - startX;
+    const dy = endY - startY;
+    const arrowLength = Math.hypot(dx, dy);
 
-    const headLength = 12;
+    if (!Number.isFinite(arrowLength) || arrowLength <= 0) {
+        return;
+    }
+
+    const headLength = Math.max(6, Math.min(18, arrowLength * 0.25));
     const angle = Math.atan2(endY - startY, endX - startX);
 
     ctx.strokeStyle = color;
@@ -190,6 +199,18 @@ function drawArrow(startX, startY, endX, endY, color) {
     ctx.fill();
 }
 
+function getForceArrowLength(forceMagnitude) {
+    if (!Number.isFinite(forceMagnitude) || forceMagnitude <= 0) {
+        return 0;
+    }
+
+    const minArrowLength = 8;
+    const maxArrowLength = 120;
+    const scaledLength = Math.sqrt(forceMagnitude) * 6;
+
+    return Math.max(minArrowLength, Math.min(maxArrowLength, scaledLength));
+}
+
 // Draw force vectors
 // Takes the drawArrow function and applies the C++ physics to it
 
@@ -208,7 +229,6 @@ function drawForceVectors() {
     const particleCount = simulation.getParticleCount();
 
     let forceData = [];
-    let maxForceMagnitude = 0;
 
     for (let i = 0; i < particleCount; i++) {
         if (i === selectedIndex) {
@@ -223,25 +243,19 @@ function drawForceVectors() {
 
         force.delete();
 
-        // Make sure there is a threshold for what is considered the max force so the arrow doesn't get too long
-        if (magnitude > maxForceMagnitude) {
-            maxForceMagnitude = magnitude;
-        }
-
         forceData.push({ fx, fy, magnitude });
     }
 
-    if (maxForceMagnitude === 0) {
-        return;
-    }
-
     for (const force of forceData) {
+        if (!Number.isFinite(force.magnitude) || force.magnitude <= 0) {
+            continue;
+        }
+
         // Normalize force vector
         const unitX = force.fx / force.magnitude;
         const unitY = force.fy / force.magnitude;
 
-        // Minimum arrow length is 20 px
-        const arrowLength = 20 + 100 * (force.magnitude / maxForceMagnitude);
+        const arrowLength = getForceArrowLength(force.magnitude);
 
         const endX = startX + unitX * arrowLength;
         const endY = startY + unitY * arrowLength;
