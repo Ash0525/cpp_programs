@@ -204,6 +204,7 @@ function getForceArrowLength(forceMagnitude) {
         return 0;
     }
 
+    // Minimum arrow length
     const minArrowLength = 8;
     const maxArrowLength = 120;
     const scaledLength = Math.sqrt(forceMagnitude) * 6;
@@ -263,6 +264,33 @@ function drawForceVectors() {
         drawArrow(startX, startY, endX, endY, "yellow");
     }
 }
+
+// Add functionality to the buttons. Pause and clear buttons are in here together
+function setupButtons() {
+    const pauseButton = document.getElementById("pauseButton");
+    const clearButton = document.getElementById("clearButton");
+
+    // Pause button functionality
+    pauseButton.addEventListener("click", () => {
+        // pause method from simulation
+        simulation.togglePaused();
+
+        // if isPaused is true or false
+        if (simulation.isPaused()) {
+            pauseButton.textContent = "Play";
+        }
+        else {
+            pauseButton.textContent = "Pause";
+        }
+    });
+
+    // Clear button functionality
+    clearButton.addEventListener("click", () => {
+        simulation.clearParticles();
+        simulation.clearSelected();
+    });
+}
+
 var Module = {
     onRuntimeInitialized: function () {
         console.log("ChargeLab WASM loaded!");
@@ -272,7 +300,11 @@ var Module = {
 
         simulation = new Module.Simulation(900, 700);
 
+        // Mouse controls
         setupMouseControls();
+
+        // Clear and pause controls
+        setupButtons();
 
         simulation.addParticleAtFull(300, 350, 1.0, 10.0, 18.0);
         simulation.addParticleAtFull(600, 350, -1.0, 10.0, 18.0);
