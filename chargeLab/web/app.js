@@ -267,8 +267,15 @@ function drawForceVectors() {
 
 // Add functionality to the buttons. Pause and clear buttons are in here together
 function setupButtons() {
+
+    // Simulation Control
     const pauseButton = document.getElementById("pauseButton");
     const clearButton = document.getElementById("clearButton");
+
+    // Interaction Control
+    const selectModeButton = document.getElementById("selectedModeButton");
+    const positiveModeButton = document.getElementById("positiveModeButton");
+    const negativeModeButton = document.getElementById("negativeModeButton");
 
     // Pause button functionality
     pauseButton.addEventListener("click", () => {
@@ -288,6 +295,24 @@ function setupButtons() {
     clearButton.addEventListener("click", () => {
         simulation.clearParticles();
         simulation.clearSelected();
+    });
+
+    // Select Mode button functionality
+    selectModeButton.addEventListener("click", () => {
+        currentMode = "select";
+        console.log("Mode: select");
+    });
+
+    // Positive Mode button functionality
+    positiveModeButton.addEventListener("click", () => {
+        currentMode = "positive";
+        console.log("Mode: positive");
+    });
+
+    // Negative Mode button functionality
+    negativeModeButton.addEventListener("click", () => {
+        currentMode = "negative";
+        console.log("Mode: negative");
     });
 }
 
