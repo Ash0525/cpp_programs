@@ -80,6 +80,10 @@ class Simulation {
         double GetMEDrift() const;
         double GetMEDriftPct() const;
         bool IsMEStable(double tolerancePct) const;
+
+        // Fixed Particles
+        void SetSelectedFixed(bool fixedStatus);
+        bool GetSelectedFixed() const;
         
     private:
         // private functions

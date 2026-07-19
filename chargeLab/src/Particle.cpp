@@ -5,7 +5,8 @@
 #include <cmath>
 
 // Defining the Constructor
-Particle::Particle() {
+Particle::Particle()
+{
     name = "";
     mass = 1.0;
     charge = 0.0;
@@ -14,104 +15,126 @@ Particle::Particle() {
     yPos = 0.0;
     xVelocity = 0.0;
     yVelocity = 0.0;
+    fixed = false;
 }
 
 // Parameterized Constructor
-Particle::Particle(const std::string& newName, double newMass, double newCharge, 
-                   double newRadius, double newXPos, double newYPos, 
-                   double newVX, double newVY) {
-    name = newName;
-    mass = newMass;
-    charge = newCharge;
-    radius = newRadius;
-    xPos = newXPos;
-    yPos = newYPos;
-    xVelocity = newVX;
-    yVelocity = newVY;
+Particle::Particle(const std::string &newName, double newMass, double newCharge,
+                   double newRadius, double newXPos, double newYPos,
+                   double newVX, double newVY)
+    : name(newName),
+      mass(newMass),
+      charge(newCharge),
+      radius(newRadius),
+      xPos(newXPos),
+      yPos(newYPos),
+      xVelocity(newVX),
+      yVelocity(newVY),
+      fixed(false)
+{
 }
 
 // Static factory method to create an electron
-Particle Particle::CreateElectron(double xPos, double yPos, double vx, double vy) {
+Particle Particle::CreateElectron(double xPos, double yPos, double vx, double vy)
+{
     return Particle("Electron", 9.109e-31, -ELEMENTARY_CHARGE, 8.0, xPos, yPos, vx, vy);
 }
 
 // Static factory method to create a proton
-Particle Particle::CreateProton(double xPos, double yPos, double vx, double vy) {
+Particle Particle::CreateProton(double xPos, double yPos, double vx, double vy)
+{
     return Particle("Proton", 1.673e-27, ELEMENTARY_CHARGE, 5.0, xPos, yPos, vx, vy);
 }
 
 // Setting the name
-void Particle::SetName(const std::string& newName) {
+void Particle::SetName(const std::string &newName)
+{
     name = newName;
 }
 
-std::string Particle::GetName() const {
+std::string Particle::GetName() const
+{
     return name;
 }
 
 // Setting the mass
-void Particle::SetMass(double newMass) {
-    if (newMass <= 0.0) {
+void Particle::SetMass(double newMass)
+{
+    if (newMass <= 0.0)
+    {
         throw std::invalid_argument("Particle mass can't be negative, bro");
     }
     mass = newMass;
 }
 
-double Particle::GetMass() const {
+double Particle::GetMass() const
+{
     return mass;
 }
 
 // Setting the charge
-void Particle::SetCharge(double newCharge) {
+void Particle::SetCharge(double newCharge)
+{
     charge = newCharge;
 }
 
-double Particle::GetCharge() const {
+double Particle::GetCharge() const
+{
     return charge;
 }
 
 // Setting the radius.
-void Particle::SetRadius(double newRadius) {
-    if (newRadius < 0.0) {
+void Particle::SetRadius(double newRadius)
+{
+    if (newRadius < 0.0)
+    {
         throw std::invalid_argument("Particle cannot have a negative radius, my dude");
     }
     radius = newRadius;
 }
 
-double Particle::GetRadius() const {
+double Particle::GetRadius() const
+{
     return radius;
 }
 
 // Set position
-void Particle::SetPosition(double newXPos, double newYPos) {
+void Particle::SetPosition(double newXPos, double newYPos)
+{
     xPos = newXPos;
     yPos = newYPos;
 }
 
-double Particle::GetXPos() const {
+double Particle::GetXPos() const
+{
     return xPos;
 }
 
-double Particle::GetYPos() const {
+double Particle::GetYPos() const
+{
     return yPos;
 }
 
 // Set velocity
-void Particle::SetVelocity(double newVX, double newVY) {
+void Particle::SetVelocity(double newVX, double newVY)
+{
     xVelocity = newVX;
     yVelocity = newVY;
 }
 
-double Particle::GetVX() const {
+double Particle::GetVX() const
+{
     return xVelocity;
 }
 
-double Particle::GetVY() const {
+double Particle::GetVY() const
+{
     return yVelocity;
 }
 
 // Define distance from one particle to another
-double Particle::DistanceTo(const Particle& otherParticle) const {
+double Particle::DistanceTo(const Particle &otherParticle) const
+{
 
     double dx = otherParticle.xPos - xPos;
     double dy = otherParticle.yPos - yPos;
@@ -120,13 +143,20 @@ double Particle::DistanceTo(const Particle& otherParticle) const {
 }
 
 // Apply force
-void Particle::ApplyForce(double fx, double fy, double dt) {
+void Particle::ApplyForce(double fx, double fy, double dt)
+{
+    // If the particle is fixed, do not apply force
+    if (fixed) {
+        return;
+    }
 
-    if (mass <= 0.0) {
+    if (mass <= 0.0)
+    {
         throw std::runtime_error("Why you dividing by zero???");
     }
 
-    if (dt < 0.0) {
+    if (dt < 0.0)
+    {
         throw std::runtime_error("Are you going back in time?");
     }
     // acceleration = force / mass
@@ -138,15 +168,36 @@ void Particle::ApplyForce(double fx, double fy, double dt) {
 }
 
 // Moving the particle
-void Particle::Move(double dt) {
+void Particle::Move(double dt)
+{
+
+    if (fixed) {
+        return;
+    }
 
     // position = velocity * time
     xPos += xVelocity * dt;
     yPos += yVelocity * dt;
 }
 
+// Fixed particles
+void Particle::SetFixed(bool fixedStatus)
+{
+    fixed = fixedStatus;
+
+    if (fixed) {
+        SetVelocity(0.0, 0.0);
+    }
+}
+
+bool Particle::isFixed() const
+{
+    return fixed;
+}
+
 // Print basic stuff from the particle
-void Particle::Print() const {
+void Particle::Print() const
+{
     std::cout << "Name: " << name << std::endl;
     std::cout << "Mass: " << mass << std::endl;
     std::cout << "Charge: " << charge << std::endl;

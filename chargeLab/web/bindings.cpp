@@ -26,6 +26,8 @@ EMSCRIPTEN_BINDINGS(charge_lab_module) {
             select_overload<bool(double, double, double, double, double)>(&Simulation::AddParticleAt)
         )
         .function("clearParticles", &Simulation::ClearParticles)
+        .function("setSelectedFixed", &Simulation::SetSelectedFixed)
+        .function("getSelectedFixed", &Simulation::GetSelectedFixed)
         .function("getParticleCount", &Simulation::GetParticleCount)
         .function("getMaxParticles", &Simulation::GetMaxParticles)
         .function("getParticleX", &Simulation::GetParticleX)

@@ -54,6 +54,10 @@ class Particle {
         void Move(double dt);
         void Print() const;
 
+        // Fixed particles
+        void SetFixed(bool fixedStatus);
+        bool isFixed() const;
+
     private:
         std::string name;
         double mass;
@@ -65,4 +69,7 @@ class Particle {
 
         double xVelocity;
         double yVelocity;
+
+        // for fixed particles
+        bool fixed;
 };

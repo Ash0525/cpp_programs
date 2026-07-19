@@ -830,3 +830,18 @@ double Simulation::GetMEDriftPct() const {
 bool Simulation::IsMEStable(double tolerancePct) const {
     return std::abs(GetMEDriftPct()) <= tolerancePct;
 }
+
+void Simulation::SetSelectedFixed(bool fixedStatus) {
+    if(!HasSelectedParticle()) {
+        return;
+    }
+
+    particles[selectedParticleIndex].SetFixed(fixedStatus);
+}
+bool Simulation::GetSelectedFixed() const {
+    if(!HasSelectedParticle()) {
+        return false;
+    }
+
+    return particles[selectedParticleIndex].isFixed();
+}
