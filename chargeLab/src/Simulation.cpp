@@ -288,18 +288,36 @@ void Simulation::HandleParticleCollisions()
 
                 // Normalize the vectors
                 Vector2D direction = delta.Normalized();
+                bool iFixed = particles[i].isFixed();
+                bool jFixed = particles[j].isFixed();
 
                 double overlap = minDistance - distance;
 
-                // Push particle i backward
-                particles[i].SetPosition(
-                    particles[i].GetXPos() - direction.GetX() * overlap / 2.0,
-                    particles[i].GetYPos() - direction.GetY() * overlap / 2.0);
+                // Separate overlap without moving fixed particles.
+                if (!iFixed && !jFixed)
+                {
+                    // Push particle i backward
+                    particles[i].SetPosition(
+                        particles[i].GetXPos() - direction.GetX() * overlap / 2.0,
+                        particles[i].GetYPos() - direction.GetY() * overlap / 2.0);
 
-                // Push particle j forward
-                particles[j].SetPosition(
-                    particles[j].GetXPos() + direction.GetX() * overlap / 2.0,
-                    particles[j].GetYPos() + direction.GetY() * overlap / 2.0);
+                    // Push particle j forward
+                    particles[j].SetPosition(
+                        particles[j].GetXPos() + direction.GetX() * overlap / 2.0,
+                        particles[j].GetYPos() + direction.GetY() * overlap / 2.0);
+                }
+                else if (iFixed && !jFixed)
+                {
+                    particles[j].SetPosition(
+                        particles[j].GetXPos() + direction.GetX() * overlap,
+                        particles[j].GetYPos() + direction.GetY() * overlap);
+                }
+                else if (!iFixed && jFixed)
+                {
+                    particles[i].SetPosition(
+                        particles[i].GetXPos() - direction.GetX() * overlap,
+                        particles[i].GetYPos() - direction.GetY() * overlap);
+                }
 
                 double q1 = particles[i].GetCharge();
                 double q2 = particles[j].GetCharge();
@@ -322,9 +340,20 @@ void Simulation::HandleParticleCollisions()
                     double finalVx = ((m1 * vx1) + (m2 * vx2)) / (m1 + m2);
                     double finalVy = ((m1 * vy1) + (m2 * vy2)) / (m1 + m2);
 
-                    // Set the velocity for the inelastic collision
-                    particles[i].SetVelocity(finalVx, finalVy);
-                    particles[j].SetVelocity(finalVx, finalVy);
+                    // Set collision velocities without changing fixed particles.
+                    if (!iFixed && !jFixed)
+                    {
+                        particles[i].SetVelocity(finalVx, finalVy);
+                        particles[j].SetVelocity(finalVx, finalVy);
+                    }
+                    else if (iFixed && !jFixed)
+                    {
+                        particles[j].SetVelocity(particles[i].GetVX(), particles[i].GetVY());
+                    }
+                    else if (!iFixed && jFixed)
+                    {
+                        particles[i].SetVelocity(particles[j].GetVX(), particles[j].GetVY());
+                    }
                 }
             }
         }

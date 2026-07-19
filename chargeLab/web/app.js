@@ -100,6 +100,10 @@ function animationLoop(currentTime) {
             }
 
             drawParticles();
+
+            // Update the panel
+            updateSelectedPanel();
+
         } catch (error) {
             physicsCrashed = true;
             console.error("Simulation failed somehow ya noob", error);
@@ -290,6 +294,7 @@ function setupButtons() {
     const selectModeButton = document.getElementById("selectedModeButton");
     const positiveModeButton = document.getElementById("positiveModeButton");
     const negativeModeButton = document.getElementById("negativeModeButton");
+    const fixedButton = document.getElementById("fixedButton");
 
     // Pause button functionality
     pauseButton.addEventListener("click", () => {
@@ -332,6 +337,23 @@ function setupButtons() {
         updateModeButtons();
     });
 
+    // Fixed button
+    fixedButton.addEventListener("click", () => {
+        if (!simulation.hasSelected()) {
+            return;
+        }
+
+        const currentlyFixed = simulation.getSelectedFixed();
+        simulation.setSelectedFixed(!currentlyFixed);
+
+        if (simulation.getSelectedFixed()) {
+            fixedbutton.textContent = "Unfix Selected";
+        }
+        else {
+            fixedButton.textContent = "Fix Selected";
+        }
+    });
+
     updateModeButtons();
 }
 
@@ -354,6 +376,44 @@ function updateModeButtons() {
     else if (currentMode === "negative") {
         negativeModeButton.classList.add("active-mode");
     }
+}
+
+function updateSelectedPanel() {
+    const status = document.getElementById("selectedStatus");
+    const charge = document.getElementById("selectedCharge");
+    const mass = document.getElementById("selectedMass");
+    const radius = document.getElementById("selectedRadius");
+    const position = document.getElementById("selectedPosition");
+    const velocity = document.getElementById("selectedVelocity");
+    const fixed = document.getElementById("selectedFixed");
+
+    if (!simulation.hasSelected()) {
+        status.textContent = "No particle seleced";
+        charge.textContent = "--";
+        mass.textContent = "--";
+        radius.textContent = "--";
+        position.textContent = "--";
+        velocity.textContent = "--";
+        fixed.textContent = "--";
+        return;
+    }
+
+    selectedStatus.textContent = "Particle Selected";
+
+    const x = simulation.getSelectedX().toFixed(1);
+    const y = simulation.getSelectedY().toFixed(1);
+    
+    const vx = simulation.getSelectedVx().toFixed(2);
+    const vy = simulation.getSelectedVy().toFixed(2);
+
+    charge.textContent = simulation.getSelectedCharge().toFixed(2);
+    mass.textContent = simulation.getSelectedMass().toFixed(2);
+    radius.textContent = simulation.getSelectedRadius().toFixed(2);
+
+    position.textContent = `(${x}, ${y})`;
+    velocity.textContent = `(${vx}, ${vy})`;
+
+    selectedFixed.textContent = simulation.getSelectedFixed() ? "Yes" : "No";
 }
 
 var Module = {
