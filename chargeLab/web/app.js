@@ -10,6 +10,7 @@ let mouseX = 0;
 let mouseY = 0;
 
 let currentMode = "select";
+
 const MAX_FRAME_DT = 1.0 / 20.0;
 const MAX_SUBSTEP_DT = 1.0 / 240.0;
 
@@ -314,19 +315,45 @@ function setupButtons() {
     selectModeButton.addEventListener("click", () => {
         currentMode = "select";
         console.log("Mode: select");
+        updateModeButtons();
     });
 
     // Positive Mode button functionality
     positiveModeButton.addEventListener("click", () => {
         currentMode = "positive";
         console.log("Mode: positive");
+        updateModeButtons();
     });
 
     // Negative Mode button functionality
     negativeModeButton.addEventListener("click", () => {
         currentMode = "negative";
         console.log("Mode: negative");
+        updateModeButtons();
     });
+
+    updateModeButtons();
+}
+
+// Update the buttons to show selection
+function updateModeButtons() {
+    const selectModeButton = document.getElementById("selectedModeButton");
+    const positiveModeButton = document.getElementById("positiveModeButton");
+    const negativeModeButton = document.getElementById("negativeModeButton");
+
+    selectModeButton.classList.remove("active-mode");
+    positiveModeButton.classList.remove("active-mode");
+    negativeModeButton.classList.remove("active-mode");
+
+    if (currentMode === "select") {
+        selectModeButton.classList.add("active-mode");
+    }
+    else if (currentMode === "positive") {
+        positiveModeButton.classList.add("active-mode");
+    }
+    else if (currentMode === "negative") {
+        negativeModeButton.classList.add("active-mode");
+    }
 }
 
 var Module = {
