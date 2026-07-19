@@ -9,6 +9,7 @@ let isDraggingSelected = false;
 let mouseX = 0;
 let mouseY = 0;
 
+let currentMode = "select";
 const MAX_FRAME_DT = 1.0 / 20.0;
 const MAX_SUBSTEP_DT = 1.0 / 240.0;
 
@@ -126,6 +127,18 @@ function setupMouseControls() {
     canvas.addEventListener("mousedown", (event) => {
         getMousePosition(event);
 
+        // Add mode selections
+        if (currentMode === "positive") {
+            simulation.addParticleAtFull(mouseX, mouseY, 1.0, 10.0, 18.0);
+            simulation.setME0();
+            return;
+        }
+
+        if (currentMode === "negative") {
+            simulation.addParticleAtFull(mouseX, mouseY, -1.0, 10.0, 18.0);
+            simulation.setME0();
+            return;
+        }
         // Boolean in selected if the mouse is at particle
         const selected = simulation.selectParticleAt(mouseX, mouseY);
 
