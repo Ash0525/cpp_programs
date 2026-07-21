@@ -508,8 +508,11 @@ function resetDemo() {
     simulation.clearParticles();
     simulation.clearSelected();
 
-    simulation.addParticleAtFull(300, 350, 1.0, 10.0, 18.0);
-    simulation.addParticleAtFull(600, 350, -1.0, 10.0, 18.0);
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    simulation.addParticleAtFull(centerX - 20, centerY, 1.0, 10.0, 18.0);
+    simulation.addParticleAtFull(centerX + 20, centerY, -1.0, 10.0, 18.0);
 
     currentMode = "select";
     updateModeButtons();
@@ -540,7 +543,7 @@ var Module = {
         canvas = document.getElementById("simCanvas");
         ctx = canvas.getContext("2d");
 
-        simulation = new Module.Simulation(900, 700);
+        simulation = new Module.Simulation(canvas.width, canvas.height);
 
         // Mouse controls
         setupMouseControls();
@@ -548,10 +551,7 @@ var Module = {
         // Clear and pause controls
         setupButtons();
 
-        simulation.addParticleAtFull(300, 350, 1.0, 10.0, 18.0);
-        simulation.addParticleAtFull(600, 350, -1.0, 10.0, 18.0);
-
-        simulation.setME0();
+        resetDemo();
 
         console.log("Particle count:", simulation.getParticleCount());
 

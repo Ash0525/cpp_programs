@@ -10,8 +10,12 @@
     <main>
         <section class="simulation-area">
             <h1>ChargeLab Web</h1>
+            <canvas id="simCanvas" width="1400" height="700"></canvas>
 
-            <canvas id="simCanvas" width="900" height="700"></canvas>
+            <p class="app-description">
+                ChargeLab is an interactive Coulomb-force simulator written in C++ and compiled to WebAssembly.
+                Add, select, drag, edit, and fix charged particles to explore electric forces.
+            </p>
         </section>
 
         <aside class="side-panel collapsed" id="sidePanel">
@@ -21,6 +25,20 @@
             </button>
 
             <div class="panel-content" id="panelContent" hidden>
+                <details class="instructions">
+                    <summary>How to Use</summary>
+
+                    <p>Select a mode, then interact with the canvas.</p>
+
+                    <ul>
+                        <li><strong>Select/Drag:</strong> click and drag particles</li>
+                        <li><strong>Add +:</strong> click canvas to add a positive charge</li>
+                        <li><strong>Add -:</strong> click canvas to add a negative charge</li>
+                        <li><strong>Fix Selected:</strong> keep a selected particle in place</li>
+                        <li><strong>Apply Changes:</strong> update the selected particle's values</li>
+                    </ul>
+                </details>
+
                 <section class="controls">
                     <button id="pauseButton" type="button">Pause</button>
                     <button id="clearButton" type="button">Clear</button>
@@ -76,13 +94,15 @@
                         </label>
 
                         <label>
-                            Position X
-                            <input id="xInput" type="number" step="0.1">
+                            Position X (0–1400)
+                            <input id="xInput" type="number" min="0" max="1400" step="0.1"
+                                   title="Enter an X position from 0 to 1400">
                         </label>
 
                         <label>
-                            Position Y
-                            <input id="yInput" type="number" step="0.1">
+                            Position Y (0–700)
+                            <input id="yInput" type="number" min="0" max="700" step="0.1"
+                                   title="Enter a Y position from 0 to 700">
                         </label>
 
                         <button id="applySelectedButton" type="button">Apply Changes</button>

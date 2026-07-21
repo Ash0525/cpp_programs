@@ -44,12 +44,19 @@ h1 {
 canvas {
     display: block;
     flex: 0 1 auto;
-    width: min(100%, calc((100vh - 70px) * 9 / 7));
+    width: min(100%, calc((100vh - 130px) * 2));
     height: auto;
-    max-height: calc(100vh - 70px);
-    aspect-ratio: 9 / 7;
+    max-height: calc(100vh - 130px);
+    aspect-ratio: 2 / 1;
     background: black;
     border: 2px solid hsl(0, 0%, 27%);
+}
+
+.app-description {
+    align-self: stretch;
+    margin: 10px 0 0;
+    line-height: 1.4;
+    color: hsl(0, 0%, 78%);
 }
 
 .side-panel {
@@ -85,7 +92,7 @@ canvas {
 
 .panel-content {
     height: calc(100vh - 48px);
-    padding: 14px;
+    padding: 10px;
     overflow-y: auto;
 }
 
@@ -98,17 +105,40 @@ canvas {
     writing-mode: vertical-rl;
 }
 
+.instructions {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid hsl(0, 0%, 28%);
+}
+
+.instructions summary {
+    padding: 6px 0;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.instructions p {
+    margin: 8px 0;
+}
+
+.instructions ul {
+    margin: 6px 0 0;
+    padding-left: 22px;
+    font-size: 0.9rem;
+}
+
 .controls {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    padding-bottom: 16px;
+    gap: 6px;
+    padding-bottom: 10px;
     border-bottom: 1px solid hsl(0, 0%, 28%);
 }
 
 .controls button,
 #applySelectedButton {
-    padding: 8px 12px;
+    padding: 7px 10px;
     border: 1px solid hsl(0, 0%, 35%);
     border-radius: 6px;
     background: hsl(0, 0%, 13%);
@@ -128,31 +158,47 @@ canvas {
     font-weight: bold;
 }
 
+.selected-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 12px;
+}
+
 .selected-panel h2 {
-    margin: 18px 0 12px;
+    grid-column: 1 / -1;
+    margin: 12px 0 6px;
     font-size: 1.25rem;
 }
 
 .selected-panel p {
-    margin: 8px 0;
+    margin: 4px 0;
+}
+
+#selectedStatus {
+    grid-column: 1 / -1;
 }
 
 .selected-editor {
-    margin-top: 22px;
-    padding-top: 4px;
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+    margin-top: 10px;
+    padding-top: 8px;
     border-top: 1px solid hsl(0, 0%, 28%);
 }
 
 .selected-editor h3 {
-    margin-bottom: 14px;
+    grid-column: 1 / -1;
+    margin: 0 0 2px;
 }
 
 .selected-editor label {
-    display: grid;
-    grid-template-columns: 1fr 120px;
-    align-items: center;
-    gap: 12px;
-    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    font-size: 0.9rem;
 }
 
 .selected-editor input {
@@ -165,8 +211,9 @@ canvas {
 }
 
 #applySelectedButton {
+    grid-column: 1 / -1;
     width: 100%;
-    margin-top: 8px;
+    margin-top: 2px;
 }
 
 @media (max-width: 700px) {
