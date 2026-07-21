@@ -495,6 +495,21 @@ function updateSelectedEditorInputs() {
     vyInput.value = simulation.getSelectedVy().toFixed(2);
 }
 
+// Reset Demo
+function resetDemo() {
+    physicsCrashed = false;
+
+    simulation.clearParticles();
+    simulation.clearSelected();
+
+    simulation.addParticleAtFull(300, 350, 1.0, 10.0, 18.0);
+    simulation.addParticleAtFull(600, 350, -1.0, 10.0, 18.0);
+
+    currentMode = "select";
+    updateModeButtons();
+
+    simulation.setME0();
+}
 
 function setupSidePanel() {
     const sidePanel = document.getElementById("sidePanel");
