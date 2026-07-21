@@ -292,6 +292,7 @@ function setupButtons() {
     // Simulation Control
     const pauseButton = document.getElementById("pauseButton");
     const clearButton = document.getElementById("clearButton");
+    const resetDemoButton = document.getElementById("resetDemoButton");
 
     // Interaction Control
     const selectModeButton = document.getElementById("selectedModeButton");
@@ -301,6 +302,11 @@ function setupButtons() {
 
     const applySelectedButton = document.getElementById("applySelectedButton");
 
+    // Reset Demo Button functionality
+    resetDemoButton.addEventListener("click", () => {
+        resetDemo();
+    })
+    
     // Pause button functionality
     pauseButton.addEventListener("click", () => {
         // pause method from simulation
