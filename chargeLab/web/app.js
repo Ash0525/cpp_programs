@@ -14,6 +14,53 @@ let currentMode = "select";
 const MAX_FRAME_DT = 1.0 / 20.0;
 const MAX_SUBSTEP_DT = 1.0 / 240.0;
 
+const METERS_PER_PIXEL = 0.004;
+const MIN_PHYSICAL_RADIUS_METERS = 1.0e-6;
+const MAX_PHYSICAL_RADIUS_METERS = 1.0e-4;
+const MIN_DISPLAY_RADIUS_PIXELS = 6.0;
+const MAX_DISPLAY_RADIUS_PIXELS = 18.0;
+
+const DEFAULT_CHARGE_MICROCOULOMBS = 1.0;
+const DEFAULT_MASS_KILOGRAMS = 0.1;
+const DEFAULT_RADIUS_METERS = 1.0e-5;
+
+function metersToPixels(meters) {
+    return meters / METERS_PER_PIXEL;
+}
+
+function pixelsToMeters(pixels) {
+    return pixels * METERS_PER_PIXEL;
+}
+
+function physicalRadiusToDisplayPixels(radiusMeters) {
+    const clampedRadius = Math.max(
+        MIN_PHYSICAL_RADIUS_METERS,
+        Math.min(MAX_PHYSICAL_RADIUS_METERS, radiusMeters)
+    );
+    const rangeInDecades = Math.log10(MAX_PHYSICAL_RADIUS_METERS) -
+        Math.log10(MIN_PHYSICAL_RADIUS_METERS);
+    const positionInRange = (
+        Math.log10(clampedRadius) - Math.log10(MIN_PHYSICAL_RADIUS_METERS)
+    ) / rangeInDecades;
+
+    return MIN_DISPLAY_RADIUS_PIXELS +
+        positionInRange * (MAX_DISPLAY_RADIUS_PIXELS - MIN_DISPLAY_RADIUS_PIXELS);
+}
+
+function displayPixelsToPhysicalRadius(radiusPixels) {
+    const positionInRange = (
+        radiusPixels - MIN_DISPLAY_RADIUS_PIXELS
+    ) / (MAX_DISPLAY_RADIUS_PIXELS - MIN_DISPLAY_RADIUS_PIXELS);
+    const clampedPosition = Math.max(0, Math.min(1, positionInRange));
+    const exponent = Math.log10(MIN_PHYSICAL_RADIUS_METERS) +
+        clampedPosition * (
+            Math.log10(MAX_PHYSICAL_RADIUS_METERS) -
+            Math.log10(MIN_PHYSICAL_RADIUS_METERS)
+        );
+
+    return 10 ** exponent;
+}
+
 function isFiniteParticleValue(value) {
     return Number.isFinite(value);
 }
@@ -137,13 +184,25 @@ function setupMouseControls() {
 
         // Add mode selections
         if (currentMode === "positive") {
-            simulation.addParticleAtFull(mouseX, mouseY, 1.0, 10.0, 18.0);
+            simulation.addParticleAtFull(
+                mouseX,
+                mouseY,
+                DEFAULT_CHARGE_MICROCOULOMBS,
+                DEFAULT_MASS_KILOGRAMS,
+                physicalRadiusToDisplayPixels(DEFAULT_RADIUS_METERS)
+            );
             simulation.setME0();
             return;
         }
 
         if (currentMode === "negative") {
-            simulation.addParticleAtFull(mouseX, mouseY, -1.0, 10.0, 18.0);
+            simulation.addParticleAtFull(
+                mouseX,
+                mouseY,
+                -DEFAULT_CHARGE_MICROCOULOMBS,
+                DEFAULT_MASS_KILOGRAMS,
+                physicalRadiusToDisplayPixels(DEFAULT_RADIUS_METERS)
+            );
             simulation.setME0();
             return;
         }
@@ -225,10 +284,17 @@ function getForceArrowLength(forceMagnitude) {
         return 0;
     }
 
-    // Minimum arrow length
+    const forceNewtons = forceMagnitude * METERS_PER_PIXEL;
     const minArrowLength = 8;
     const maxArrowLength = 120;
-    const scaledLength = Math.sqrt(forceMagnitude) * 6;
+    const minForceExponent = -6;
+    const maxForceExponent = 4;
+    const forceExponent = Math.log10(forceNewtons);
+    const scalePosition = (
+        forceExponent - minForceExponent
+    ) / (maxForceExponent - minForceExponent);
+    const scaledLength = minArrowLength +
+        scalePosition * (maxArrowLength - minArrowLength);
 
     return Math.max(minArrowLength, Math.min(maxArrowLength, scaledLength));
 }
@@ -372,33 +438,44 @@ function setupButtons() {
         }
 
         // Get the values of each element
-        const x = parseFloat(document.getElementById("xInput").value);
-        const y = parseFloat(document.getElementById("yInput").value);
-        const charge = parseFloat(document.getElementById("chargeInput").value);
-        const mass = parseFloat(document.getElementById("massInput").value);
-        const radius = parseFloat(document.getElementById("radiusInput").value);
-        const vx = parseFloat(document.getElementById("vxInput").value);
-        const vy = parseFloat(document.getElementById("vyInput").value);
+        const inputs = Array.from(document.querySelectorAll(".selected-editor input"));
+        const invalidInput = inputs.find((input) => !input.checkValidity());
+
+        if (invalidInput) {
+            invalidInput.reportValidity();
+            return;
+        }
+
+        const xMeters = parseFloat(document.getElementById("xInput").value);
+        const yMeters = parseFloat(document.getElementById("yInput").value);
+        const chargeMicrocoulombs = parseFloat(document.getElementById("chargeInput").value);
+        const massKilograms = parseFloat(document.getElementById("massInput").value);
+        const radiusMeters = parseFloat(document.getElementById("radiusInput").value);
+        const vxMetersPerSecond = parseFloat(document.getElementById("vxInput").value);
+        const vyMetersPerSecond = parseFloat(document.getElementById("vyInput").value);
 
         // If any are not a number, return
         if (
-            Number.isNaN(x) ||
-            Number.isNaN(y) ||
-            Number.isNaN(charge) ||
-            Number.isNaN(mass) ||
-            Number.isNaN(radius) ||
-            Number.isNaN(vx) ||
-            Number.isNaN(vy)
+            Number.isNaN(xMeters) ||
+            Number.isNaN(yMeters) ||
+            Number.isNaN(chargeMicrocoulombs) ||
+            Number.isNaN(massKilograms) ||
+            Number.isNaN(radiusMeters) ||
+            Number.isNaN(vxMetersPerSecond) ||
+            Number.isNaN(vyMetersPerSecond)
         ) {
             return;
         }
 
         // Change the particle's values
-        simulation.moveSelected(x, y);
-        simulation.setSelectedCharge(charge);
-        simulation.setSelectedMass(mass);
-        simulation.setSelectedRadius(radius);
-        simulation.setSelectedVelocity(vx, vy);
+        simulation.moveSelected(metersToPixels(xMeters), metersToPixels(yMeters));
+        simulation.setSelectedCharge(chargeMicrocoulombs);
+        simulation.setSelectedMass(massKilograms);
+        simulation.setSelectedRadius(physicalRadiusToDisplayPixels(radiusMeters));
+        simulation.setSelectedVelocity(
+            metersToPixels(vxMetersPerSecond),
+            metersToPixels(vyMetersPerSecond)
+        );
 
         simulation.setME0();
     });
@@ -449,15 +526,17 @@ function updateSelectedPanel() {
 
     selectedStatus.textContent = "Particle Selected";
 
-    const x = simulation.getSelectedX().toFixed(1);
-    const y = simulation.getSelectedY().toFixed(1);
+    const x = pixelsToMeters(simulation.getSelectedX()).toFixed(2);
+    const y = pixelsToMeters(simulation.getSelectedY()).toFixed(2);
     
-    const vx = simulation.getSelectedVx().toFixed(2);
-    const vy = simulation.getSelectedVy().toFixed(2);
+    const vx = pixelsToMeters(simulation.getSelectedVx()).toFixed(2);
+    const vy = pixelsToMeters(simulation.getSelectedVy()).toFixed(2);
 
     charge.textContent = simulation.getSelectedCharge().toFixed(2);
     mass.textContent = simulation.getSelectedMass().toFixed(2);
-    radius.textContent = simulation.getSelectedRadius().toFixed(2);
+    radius.textContent = displayPixelsToPhysicalRadius(
+        simulation.getSelectedRadius()
+    ).toExponential(2);
 
     position.textContent = `(${x}, ${y})`;
     velocity.textContent = `(${vx}, ${vy})`;
@@ -492,13 +571,15 @@ function updateSelectedEditorInputs() {
         return;
     }
 
-    xInput.value = simulation.getSelectedX().toFixed(1);
-    yInput.value = simulation.getSelectedY().toFixed(1);
+    xInput.value = pixelsToMeters(simulation.getSelectedX()).toFixed(2);
+    yInput.value = pixelsToMeters(simulation.getSelectedY()).toFixed(2);
     chargeInput.value = simulation.getSelectedCharge().toFixed(2);
     massInput.value = simulation.getSelectedMass().toFixed(2);
-    radiusInput.value = simulation.getSelectedRadius().toFixed(2);
-    vxInput.value = simulation.getSelectedVx().toFixed(2);
-    vyInput.value = simulation.getSelectedVy().toFixed(2);
+    radiusInput.value = displayPixelsToPhysicalRadius(
+        simulation.getSelectedRadius()
+    ).toExponential(2);
+    vxInput.value = pixelsToMeters(simulation.getSelectedVx()).toFixed(2);
+    vyInput.value = pixelsToMeters(simulation.getSelectedVy()).toFixed(2);
 }
 
 // Reset Demo
@@ -511,8 +592,23 @@ function resetDemo() {
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
 
-    simulation.addParticleAtFull(centerX - 20, centerY, 1.0, 10.0, 18.0);
-    simulation.addParticleAtFull(centerX + 20, centerY, -1.0, 10.0, 18.0);
+    const halfMeterInPixels = metersToPixels(0.5);
+    const displayRadius = physicalRadiusToDisplayPixels(DEFAULT_RADIUS_METERS);
+
+    simulation.addParticleAtFull(
+        centerX - halfMeterInPixels,
+        centerY,
+        DEFAULT_CHARGE_MICROCOULOMBS,
+        DEFAULT_MASS_KILOGRAMS,
+        displayRadius
+    );
+    simulation.addParticleAtFull(
+        centerX + halfMeterInPixels,
+        centerY,
+        -DEFAULT_CHARGE_MICROCOULOMBS,
+        DEFAULT_MASS_KILOGRAMS,
+        displayRadius
+    );
 
     currentMode = "select";
     updateModeButtons();

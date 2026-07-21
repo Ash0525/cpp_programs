@@ -58,9 +58,9 @@ Simulation::Simulation()
     width = 900.0;
     height = 700.0;
     coulombConstant = 8.9875517923e9;
-    metersPerPixel = 0.01;
+    metersPerPixel = 0.004;
     coulombsPerChargeUnit = 1.0e-6;
-    kilogramsPerMassUnit = 1.0e-3;
+    kilogramsPerMassUnit = 1.0;
     minDistanceClamp = 20.0;
 
     // Add pause default
@@ -87,9 +87,9 @@ Simulation::Simulation(double width, double height)
     this->width = width;
     this->height = height;
     coulombConstant = 8.9875517923e9;
-    metersPerPixel = 0.01;
+    metersPerPixel = 0.004;
     coulombsPerChargeUnit = 1.0e-6;
-    kilogramsPerMassUnit = 1.0e-3;
+    kilogramsPerMassUnit = 1.0;
     minDistanceClamp = 20.0;
 
     // Add puase defualt
@@ -790,17 +790,20 @@ double Simulation::GetKE() const {
     for (size_t i = 0; i < static_cast<int>(particles.size()); i++) {
 
         // Get the mass of each particle
-        double mass = particles[i].GetMass();
+        double massKilograms = particles[i].GetMass() * kilogramsPerMassUnit;
 
         // Get the velocity
         double vx = particles[i].GetVX();
         double vy = particles[i].GetVY();
 
         // Calculated velocity squared. Consider that we don't need the square root from magnitude
-        double speedSquared = (vx * vx) + (vy * vy);
+        double vxMetersPerSecond = vx * metersPerPixel;
+        double vyMetersPerSecond = vy * metersPerPixel;
+        double speedSquared = (vxMetersPerSecond * vxMetersPerSecond) +
+                              (vyMetersPerSecond * vyMetersPerSecond);
 
         // Return the total Kinetic energy
-        totalKE += 0.5 * mass * speedSquared;
+        totalKE += 0.5 * massKilograms * speedSquared;
     }
 
     return totalKE;

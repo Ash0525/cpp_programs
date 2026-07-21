@@ -105,24 +105,28 @@ canvas {
     writing-mode: vertical-rl;
 }
 
-.instructions {
+.instructions,
+.unit-guide {
     margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid hsl(0, 0%, 28%);
 }
 
-.instructions summary {
+.instructions summary,
+.unit-guide summary {
     padding: 6px 0;
     cursor: pointer;
     font-size: 1.1rem;
     font-weight: bold;
 }
 
-.instructions p {
+.instructions p,
+.unit-guide p {
     margin: 8px 0;
 }
 
-.instructions ul {
+.instructions ul,
+.unit-guide ul {
     margin: 6px 0 0;
     padding-left: 22px;
     font-size: 0.9rem;
