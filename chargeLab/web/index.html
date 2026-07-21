@@ -8,82 +8,90 @@
 </head>
 <body>
     <main>
-        <h1>ChargeLab Web</h1>
+        <section class="simulation-area">
+            <h1>ChargeLab Web</h1>
 
-        <canvas id="simCanvas" width="900" height="700"></canvas>
-
-        <section class="controls">
-            <button id="pauseButton" type="button">Pause</button>
-            <button id="clearButton" type="button">Clear</button>
-
-            <!-- Particle controls -->
-            <button id="selectedModeButton" type="button">Select/Drag</button>
-            <button id="positiveModeButton" type="button">Add +</button>
-            <button id="negativeModeButton" type="button">Add -</button>
-
-            <!-- Fixed Button -->
-            <button id="fixedButton" type="button">Fix Selected</button>
+            <canvas id="simCanvas" width="900" height="700"></canvas>
         </section>
 
-        <section class="selected-panel">
-            <h2>Selected Particle</h2>
+        <aside class="side-panel collapsed" id="sidePanel">
+            <button id="panelToggleButton" type="button" class="panel-toggle"
+                    aria-controls="panelContent" aria-expanded="false">
+                Open Panel
+            </button>
 
-            <p id="selectedStatus">No particle selected</p>
+            <div class="panel-content" id="panelContent" hidden>
+                <section class="controls">
+                    <button id="pauseButton" type="button">Pause</button>
+                    <button id="clearButton" type="button">Clear</button>
 
-            <p>Charge: <span id="selectedCharge">--</span></p>
-            <p>Mass: <span id="selectedMass">--</span></p>
-            <p>Radius: <span id="selectedRadius">--</span></p>
-            <p>Position: <span id="selectedPosition">--</span></p>
-            <p>Velocity: <span id="selectedVelocity">--</span></p>
-            <p>Fixed: <span id="selectedFixed">--</span></p>
-        </section>
+                    <!-- Particle controls -->
+                    <button id="selectedModeButton" type="button">Select/Drag</button>
+                    <button id="positiveModeButton" type="button">Add +</button>
+                    <button id="negativeModeButton" type="button">Add -</button>
 
-        <div class="selected-editor">
-            <h3>Edit Selected</h3>
+                    <!-- Fixed Button -->
+                    <button id="fixedButton" type="button">Fix Selected</button>
+                </section>
 
-            <label>
-                Charge
-                <input id="chargeInput" type="number" step="0.1">
-            </label>
+                <section class="selected-panel">
+                    <h2>Selected Particle Information</h2>
 
-            <label>
-                Mass
-                <input id="massInput" type="number" step="0.1">
-            </label>
+                    <p id="selectedStatus">No particle selected</p>
 
-            <label>
-                Radius
-                <input id="radiusInput" type="number" step="0.1">
-            </label>
+                    <p>Charge: <span id="selectedCharge">--</span></p>
+                    <p>Mass: <span id="selectedMass">--</span></p>
+                    <p>Radius: <span id="selectedRadius">--</span></p>
+                    <p>Position: <span id="selectedPosition">--</span></p>
+                    <p>Velocity: <span id="selectedVelocity">--</span></p>
+                    <p>Fixed: <span id="selectedFixed">--</span></p>
 
-            <label>
-                Velocity X
-                <input id="vxInput" type="number" step="0.1">
-            </label>
+                    <div class="selected-editor">
+                        <h3>Edit Selected</h3>
 
-            <label>
-                Veloxity Y
-                <input id="vyInput" type="number" step="0.1">
-            </label>
+                        <label>
+                            Charge
+                            <input id="chargeInput" type="number" step="0.1">
+                        </label>
 
+                        <label>
+                            Mass
+                            <input id="massInput" type="number" step="0.1">
+                        </label>
 
-            <label>
-                Position X
-                <input id="xInput" type="number" step="0.1">
-            </label>
+                        <label>
+                            Radius
+                            <input id="radiusInput" type="number" step="0.1">
+                        </label>
 
+                        <label>
+                            Velocity X
+                            <input id="vxInput" type="number" step="0.1">
+                        </label>
 
-            <label>
-                Position Y
-                <input id="yInput" type="number" step="0.1">
-            </label>
+                        <label>
+                            Velocity Y
+                            <input id="vyInput" type="number" step="0.1">
+                        </label>
 
-            <button id="applySelectedButton" type="button">Apply Changes</button>
-        </div>
+                        <label>
+                            Position X
+                            <input id="xInput" type="number" step="0.1">
+                        </label>
+
+                        <label>
+                            Position Y
+                            <input id="yInput" type="number" step="0.1">
+                        </label>
+
+                        <button id="applySelectedButton" type="button">Apply Changes</button>
+                    </div>
+                </section>
+            </div>
+        </aside>
     </main>
 
     <script src="app.js"></script>
     <script src="chargeLab.js"></script>
-    
 </body>
 </html>

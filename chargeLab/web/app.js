@@ -103,6 +103,9 @@ function animationLoop(currentTime) {
 
             // Update the panel
             updateSelectedPanel();
+            updateSelectedEditorInputs();
+
+            // Update user input
 
         } catch (error) {
             physicsCrashed = true;
@@ -296,6 +299,8 @@ function setupButtons() {
     const negativeModeButton = document.getElementById("negativeModeButton");
     const fixedButton = document.getElementById("fixedButton");
 
+    const applySelectedButton = document.getElementById("applySelectedButton");
+
     // Pause button functionality
     pauseButton.addEventListener("click", () => {
         // pause method from simulation
@@ -347,11 +352,49 @@ function setupButtons() {
         simulation.setSelectedFixed(!currentlyFixed);
 
         if (simulation.getSelectedFixed()) {
-            fixedbutton.textContent = "Unfix Selected";
+            fixedButton.textContent = "Unfix Selected";
         }
         else {
             fixedButton.textContent = "Fix Selected";
         }
+    });
+
+    // Apply selected button takes user inputted values and applies them
+    applySelectedButton.addEventListener("click", () => {
+        if (!simulation.hasSelected()) {
+            return;
+        }
+
+        // Get the values of each element
+        const x = parseFloat(document.getElementById("xInput").value);
+        const y = parseFloat(document.getElementById("yInput").value);
+        const charge = parseFloat(document.getElementById("chargeInput").value);
+        const mass = parseFloat(document.getElementById("massInput").value);
+        const radius = parseFloat(document.getElementById("radiusInput").value);
+        const vx = parseFloat(document.getElementById("vxInput").value);
+        const vy = parseFloat(document.getElementById("vyInput").value);
+
+        // If any are not a number, return
+        if (
+            Number.isNaN(x) ||
+            Number.isNaN(y) ||
+            Number.isNaN(charge) ||
+            Number.isNaN(mass) ||
+            Number.isNaN(radius) ||
+            Number.isNaN(vx) ||
+            Number.isNaN(vy)
+        ) {
+            return;
+        }
+
+        // Change the particle's values
+        simulation.moveSelected(x, y);
+        simulation.setSelectedCharge(charge);
+        simulation.setSelectedMass(mass);
+        simulation.setSelectedRadius(radius);
+        simulation.setSelectedVelocity(vx, vy);
+
+        simulation.setME0();
     });
 
     updateModeButtons();
@@ -415,6 +458,59 @@ function updateSelectedPanel() {
 
     selectedFixed.textContent = simulation.getSelectedFixed() ? "Yes" : "No";
 }
+
+// Update the particle with distinct user input
+function updateSelectedEditorInputs() {
+    const editor = document.querySelector(".selected-editor");
+
+    if (editor.contains(document.activeElement)) {
+        return;
+    }
+
+    const xInput = document.getElementById("xInput");
+    const yInput = document.getElementById("yInput");
+    const chargeInput = document.getElementById("chargeInput");
+    const massInput = document.getElementById("massInput");
+    const radiusInput = document.getElementById("radiusInput");
+    const vxInput = document.getElementById("vxInput");
+    const vyInput = document.getElementById("vyInput");
+
+    if (!simulation.hasSelected()) {
+        xInput.value = "";
+        yInput.value = "";
+        chargeInput.value = "";
+        massInput.value = "";
+        radiusInput.value = "";
+        vxInput.value = "";
+        vyInput.value = "";
+        return;
+    }
+
+    xInput.value = simulation.getSelectedX().toFixed(1);
+    yInput.value = simulation.getSelectedY().toFixed(1);
+    chargeInput.value = simulation.getSelectedCharge().toFixed(2);
+    massInput.value = simulation.getSelectedMass().toFixed(2);
+    radiusInput.value = simulation.getSelectedRadius().toFixed(2);
+    vxInput.value = simulation.getSelectedVx().toFixed(2);
+    vyInput.value = simulation.getSelectedVy().toFixed(2);
+}
+
+
+function setupSidePanel() {
+    const sidePanel = document.getElementById("sidePanel");
+    const panelToggleButton = document.getElementById("panelToggleButton");
+    const panelContent = document.getElementById("panelContent");
+
+    panelToggleButton.addEventListener("click", () => {
+        const isCollapsed = sidePanel.classList.toggle("collapsed");
+
+        panelToggleButton.textContent = isCollapsed ? "Open Panel" : "Hide Panel";
+        panelToggleButton.setAttribute("aria-expanded", String(!isCollapsed));
+        panelContent.hidden = isCollapsed;
+    });
+}
+
+setupSidePanel();
 
 var Module = {
     onRuntimeInitialized: function () {
