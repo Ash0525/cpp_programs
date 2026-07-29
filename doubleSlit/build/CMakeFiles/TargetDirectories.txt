@@ -1,0 +1,4 @@
+/Users/alexash/Desktop/cpp_programs/doubleSlit/build/CMakeFiles/doubleslit_core.dir
+/Users/alexash/Desktop/cpp_programs/doubleSlit/build/CMakeFiles/native_smoke.dir
+/Users/alexash/Desktop/cpp_programs/doubleSlit/build/CMakeFiles/edit_cache.dir
+/Users/alexash/Desktop/cpp_programs/doubleSlit/build/CMakeFiles/rebuild_cache.dir

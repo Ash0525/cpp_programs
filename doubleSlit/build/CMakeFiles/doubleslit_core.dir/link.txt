@@ -1,0 +1,2 @@
+/usr/bin/ar qc libdoubleslit_core.a CMakeFiles/doubleslit_core.dir/src/DoubleSlitEngine.cpp.o
+/usr/bin/ranlib libdoubleslit_core.a
