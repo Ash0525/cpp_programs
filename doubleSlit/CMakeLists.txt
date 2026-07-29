@@ -20,3 +20,25 @@ add_executable(native_smoke
 target_link_libraries(native_smoke
     PRIVATE doubleslit_core
 )
+
+if(EMSCRIPTEN)
+    add_executable(doubleslit_wasm
+        src/bindings.cpp
+    )
+
+    target_link_libraries(doubleslit_wasm
+        PRIVATE doubleslit_core
+    )
+
+    target_link_options(doubleslit_wasm PRIVATE
+        "--bind"
+        "-sMODULARIZE=1"
+        "-sEXPORT_NAME=createDoubleSlitModule"
+        "-sENVIRONMENT=web"
+    )
+
+    set_target_properties(doubleslit_wasm PROPERTIES
+        SUFFIX ".js"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/web"
+    )
+endif()

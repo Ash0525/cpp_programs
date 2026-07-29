@@ -1,0 +1,1 @@
+/Users/alexash/Developer/emsdk/upstream/emscripten/em++ @CMakeFiles/native_smoke.dir/objects1.rsp -o native_smoke.js @CMakeFiles/native_smoke.dir/linkLibs.rsp

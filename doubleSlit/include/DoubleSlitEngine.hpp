@@ -8,5 +8,13 @@ namespace doubleslit
     {
         public:
             [[nodiscard]] std::string status() const;
+
+            double intensityAt(double screenPosition) const;
+        
+        private:
+            double wavelength;
+            double slitSeparation;
+            double slitWidth;
+            double screenDistance;
     };
 }

@@ -1,0 +1,1 @@
+/Users/alexash/Developer/emsdk/upstream/emscripten/em++ --bind -sMODULARIZE=1 -sEXPORT_NAME=createDoubleSlitModule -sENVIRONMENT=web @CMakeFiles/doubleslit_wasm.dir/objects1.rsp -o /Users/alexash/Desktop/cpp_programs/doubleSlit/web/doubleslit_wasm.js @CMakeFiles/doubleslit_wasm.dir/linkLibs.rsp

@@ -1,0 +1,2 @@
+/Users/alexash/Developer/emsdk/upstream/emscripten/emar qc libdoubleslit_core.a CMakeFiles/doubleslit_core.dir/src/DoubleSlitEngine.cpp.o
+/Users/alexash/Developer/emsdk/upstream/emscripten/emranlib libdoubleslit_core.a
