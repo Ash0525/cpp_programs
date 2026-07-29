@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "macOS",
+            "compilerPath": "/usr/bin/clang++",
+            "cppStandard": "c++20",
+            "includePath": [
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/doubleSlit/include",
+                "/Users/alexash/Developer/emsdk/upstream/emscripten/system/include"
+            ]
+        }
+    ],
+    "version": 4
+}
