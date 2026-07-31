@@ -683,14 +683,6 @@ CMakeFiles/doubleslit_wasm.dir/src/bindings.cpp.o: \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__memory/ranges_uninitialized_algorithms.h \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__memory/uses_allocator_construction.h \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/optional \
-  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/emscripten/bind.h \
-  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/emscripten/em_asm.h \
-  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/emscripten/val.h \
-  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/emscripten/wire.h \
-  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/array \
-  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__iterator/static_bounded_iter.h \
-  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/cassert \
-  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/assert.h \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/vector \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__vector/comparison.h \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__fwd/vector.h \
@@ -704,6 +696,8 @@ CMakeFiles/doubleslit_wasm.dir/src/bindings.cpp.o: \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__bit_reference \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__vector/pmr.h \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__vector/erase.h \
+  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/array \
+  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__iterator/static_bounded_iter.h \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/cerrno \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/clocale \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/locale.h \
@@ -756,6 +750,12 @@ CMakeFiles/doubleslit_wasm.dir/src/bindings.cpp.o: \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__locale_dir/wbuffer_convert.h \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__locale_dir/wstring_convert.h \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/cstdarg \
+  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/emscripten/bind.h \
+  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/emscripten/em_asm.h \
+  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/emscripten/val.h \
+  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/emscripten/wire.h \
+  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/cassert \
+  /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/assert.h \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/coroutine \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__coroutine/coroutine_handle.h \
   /Users/alexash/Developer/emsdk/upstream/emscripten/cache/sysroot/include/c++/v1/__coroutine/coroutine_traits.h \
