@@ -30,9 +30,31 @@ namespace doubleslit
                 double maxPosition,
                 int sampleCount
             ) const;
+            void setDiffractionEnabled(bool enabled);
+            [[nodiscard]] bool diffractionEnabled() const;
+
+            // Building toggles
+
+            // Wavelength toggleable
+            void setWavelength(double wavelength);
+            [[nodiscard]] double wavelength() const;
+
+            // Slit separation toggleable
+            void setSlitSeparation(double slitSeparation);
+            [[nodiscard]] double slitSeparation() const;
+
+            // Slit width toggleable
+            void setSlitWidth(double slitWidth);
+            [[nodiscard]] double slitWidth() const;
+
+            // Screen distance toggleable
+            void setScreenDistance(double screenDistance);
+            [[nodiscard]] double screenDistance() const;
         
         private:
             SimulationParameters parameters_;
+
+            bool diffractionEnabled_ = false;
     };
 
 

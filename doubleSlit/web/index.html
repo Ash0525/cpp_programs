@@ -7,7 +7,12 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1 id="status">Loading physics engine...</h1>
+    <header class="site-header">
+        <h1>DoubleSlit Web</h1>
+        <p id="status">Loading physics engine...</p>
+    </header>
+
+    <main>
 
     <section class="simulation-panel">
         <h2>Wave propagation</h2>
@@ -15,7 +20,7 @@
         <canvas
             id="waveCanvas"
             width="900"
-            height="340"
+            height="500"
         ></canvas>
 
     </section>
@@ -23,12 +28,97 @@
     <section class="simulation-panel">
         <h2>Screen intensity</h2>
 
+        <div class="control-panel">
+        <!-- Wavelength paremeter slide bar -->
+        <div class="parameter-control">
+            <label for="wavelengthSlider">
+                Wavelength:
+                <output id="wavelengthValue">650 nm</output>
+            </label>
+
+            <input
+                type="range"
+                id="wavelengthSlider"
+                min="380"
+                max="750"
+                value="650"
+                step="1"
+            >
+        </div>
+
+        <!-- Slit separation parameter slide bar -->
+        <div class="parameter-control">
+            <label for="slitSeparationSlider">
+                Slit separation:
+                <output id="slitSeparationValue">250 µm</output>
+            </label>
+
+            <input
+                type="range"
+                id="slitSeparationSlider"
+                min="100"
+                max="340"
+                value="250"
+                step="10"
+            >
+        </div>
+
+        <!-- Adjust the physical width of each slit. -->
+        <div class="parameter-control">
+            <label for="slitWidthSlider">
+                Slit width:
+                <output id="slitWidthValue">40 µm</output>
+            </label>
+
+            <input
+                type="range"
+                id="slitWidthSlider"
+                min="10"
+                max="80"
+                value="40"
+                step="5"
+            >
+        </div>
+
+        <!-- Adjust the distance to the viewing screen. -->
+        <div class="parameter-control">
+            <label for="screenDistanceSlider">
+                Screen distance:
+                <output id="screenDistanceValue">1.0 m</output>
+            </label>
+
+            <input
+                type="range"
+                id="screenDistanceSlider"
+                min="0.5"
+                max="2.0"
+                value="1.0"
+                step="0.1"
+            >
+        </div>
+
+        <!-- Toggle diffraction control (sine envelope) -->
+        <label class="diffraction-control">
+            <input type="checkbox" id="diffractionToggle">
+            Include finite-slit diffraction envelope
+        </label>
+        </div>
+
+        <!-- Graph the intensity -->
         <canvas
             id="intensityGraph"
             width="900"
             height="450"
         ></canvas>
+
     </section>
+    </main>
+
+    <p class="description">
+        DoubleSlit Web is an interactive interference simulator written in
+        C++ and compiled to WebAssembly. Adjust the experiment to explore
+        wave propagation, interference, and diffraction.
+    </p>
 
     <script src="doubleslit_wasm.js"></script>
 
