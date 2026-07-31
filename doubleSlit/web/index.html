@@ -9,11 +9,26 @@
 <body>
     <h1 id="status">Loading physics engine...</h1>
 
-    <canvas
-        id="intensityGraph"
-        width="900"
-        height="450"
-    ></canvas>
+    <section class="simulation-panel">
+        <h2>Wave propagation</h2>
+
+        <canvas
+            id="waveCanvas"
+            width="900"
+            height="340"
+        ></canvas>
+
+    </section>
+
+    <section class="simulation-panel">
+        <h2>Screen intensity</h2>
+
+        <canvas
+            id="intensityGraph"
+            width="900"
+            height="450"
+        ></canvas>
+    </section>
 
     <script src="doubleslit_wasm.js"></script>
 

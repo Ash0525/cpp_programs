@@ -1,6 +1,12 @@
+.simulation-panel {
+    width: min(900px, 100%);
+    margin-bottom: 2rem;
+}
+
+#waveCanvas,
 #intensityGraph {
     display: block;
-    width: min(900px, 100%);
+    width: 100%;
     height: auto;
     border: 1px solid black;
 }

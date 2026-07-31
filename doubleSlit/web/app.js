@@ -1,3 +1,62 @@
+// Draw the barrier, slit openings, and viewing screen.
+function drawWaveGeometry() {
+    const canvas = document.getElementById("waveCanvas");
+    const context = canvas.getContext("2d");
+
+    const barrierX = 220;
+    const screenX = 820;
+    const centerY = canvas.height / 2;
+    const slitSeparation = 90;
+    const slitHeight = 28;
+
+    // Controls the slits
+    const upperSlitY = centerY - slitSeparation / 2;
+    const lowerSlitY = centerY + slitSeparation / 2;
+
+    // Clear the previous frame and configure the geometry lines.
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.strokeStyle = "#222";
+    context.lineWidth = 5;
+
+    // Draw three barrier segments, leaving an opening at each slit.
+    context.beginPath();
+
+    context.moveTo(barrierX, 0);
+    context.lineTo(barrierX, upperSlitY - slitHeight / 2);
+
+    context.moveTo(barrierX, upperSlitY + slitHeight / 2);
+    context.lineTo(barrierX, lowerSlitY - slitHeight / 2);
+
+    context.moveTo(barrierX, lowerSlitY + slitHeight / 2);
+    context.lineTo(barrierX, canvas.height);
+
+    context.stroke();
+
+    // Draw the viewing screen.
+    context.beginPath();
+    context.moveTo(screenX, 20);
+    context.lineTo(screenX, canvas.height - 20);
+    context.stroke();
+
+    // Label the fixed parts of the experiment.
+    context.fillStyle = "#222";
+    context.font = "16px sans-serif";
+    context.textAlign = "center";
+    context.fillText("Double slits", barrierX, 18);
+    context.fillText("Screen", screenX, 18);
+
+    // Canvas drawing context, barrier and screen position, upper
+    // and lower slit positions
+    return {
+        canvas,
+        context,
+        barrierX,
+        screenX,
+        upperSlitY,
+        lowerSlitY
+    };
+}
+
 // Draw the C++-generated intensity values on the graph canvas.
 function drawIntensityGraph(positions, intensities) {
     const canvas = document.getElementById("intensityGraph");
@@ -103,7 +162,8 @@ createDoubleSlitModule().then((Module) => {
     const positions = data.positions;
     const intensities = data.intensities;
 
-    // Draw the generated interference pattern.
+    // Start the wavefront animation and draw the interference pattern.
+    requestAnimationFrame(animateWavefronts);
     drawIntensityGraph(positions, intensities);
 
     // Log a few values so the C++ to JavaScript transfer remains easy to verify.
@@ -124,6 +184,88 @@ createDoubleSlitModule().then((Module) => {
     engine.delete();
 });
 
+// Draw wavefronts emitted from both slits once per second.
+function drawWavefronts(scene, t) {
+    const context = scene.context;
 
-// Governing wave propagation ideas
-// dsin(theta) = m * lambda
+    // Canvas coordinates for the slit plane and screen.
+    const x_slits = scene.barrierX;
+    const x_screen = scene.screenX;
+    const y_upper = scene.upperSlitY;
+    const y_lower = scene.lowerSlitY;
+
+    // L_visual is the slit-to-screen distance measured in canvas pixels.
+    const L_visual = x_screen - x_slits;
+
+    // Slowed visualization values, not the physical speed of light.
+    const v_visual = 120;
+    const T_emission = 1;
+
+    const emittedWavefrontCount = Math.floor(t / T_emission);
+    const halfCanvasHeight = scene.canvas.height / 2;
+    const r_max = Math.hypot(L_visual, halfCanvasHeight);
+
+    // Clip rings to the region between the slits and the screen.
+    context.save();
+    context.beginPath();
+    context.rect(x_slits, 0, L_visual, scene.canvas.height);
+    context.clip();
+
+    context.strokeStyle = "#2563eb";
+    context.lineWidth = 2;
+
+    for (let n = 0; n <= emittedWavefrontCount; n++) {
+        // t_n is the time when wavefront n was emitted.
+        const t_n = n * T_emission;
+        const t_minus_t_n = t - t_n;
+
+        // Governing propagation equation: r_n(t) = v_visual(t - t_n).
+        const r_n = v_visual * t_minus_t_n;
+
+        if (r_n < 0 || r_n > r_max) {
+            continue;
+        }
+
+        // Draw the wavefront emitted from the upper slit.
+        context.beginPath();
+        context.arc(
+            x_slits,
+            y_upper,
+            r_n,
+            -Math.PI / 2,
+            Math.PI / 2
+        );
+        context.stroke();
+
+        // Draw the wavefront emitted from the lower slit.
+        context.beginPath();
+        context.arc(
+            x_slits,
+            y_lower,
+            r_n,
+            -Math.PI / 2,
+            Math.PI / 2
+        );
+        context.stroke();
+    }
+
+    context.restore();
+}
+
+let waveAnimationStart;
+
+// Redraw the fixed geometry and moving wavefronts every browser frame.
+function animateWavefronts(timestamp) {
+    if (waveAnimationStart === undefined) {
+        waveAnimationStart = timestamp;
+    }
+
+    const millisecondsPerSecond = 1000;
+    const t =
+        (timestamp - waveAnimationStart) / millisecondsPerSecond;
+
+    const scene = drawWaveGeometry();
+    drawWavefronts(scene, t);
+
+    requestAnimationFrame(animateWavefronts);
+}
